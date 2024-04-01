@@ -203,10 +203,10 @@ class _loginScreenState extends State<loginScreen> {
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Don't have an account?",
-                            style: TextStyle(color: Colors.white, fontSize: 13),
-                          ),
+                          // Text(
+                          //   "Don't have an account?",
+                          //   style: TextStyle(color: Colors.white, fontSize: 13),
+                          // ),
                           Text(
                             "Forgot your password?",
                             style: TextStyle(color: Colors.white, fontSize: 13),
@@ -216,28 +216,28 @@ class _loginScreenState extends State<loginScreen> {
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(40.0)),
-                              backgroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: MediaQuery.of(context).size.width / 10, vertical: 10)
-                          ),
-                          onPressed: (){
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => registerScreen())
-                            );
-                          },
-                          child: Text(
-                            'Sign Up',
-                            style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black
-                            ),
-                          ),
-                        ),
+                        // ElevatedButton(
+                        //   style: ElevatedButton.styleFrom(
+                        //       shape: RoundedRectangleBorder(
+                        //           borderRadius: BorderRadius.circular(40.0)),
+                        //       backgroundColor: Colors.white,
+                        //       padding: EdgeInsets.symmetric(
+                        //           horizontal: MediaQuery.of(context).size.width / 10, vertical: 10)
+                        //   ),
+                        //   onPressed: (){
+                        //     Navigator.push(context,
+                        //         MaterialPageRoute(builder: (context) => registerScreen())
+                        //     );
+                        //   },
+                        //   child: Text(
+                        //     'Sign Up',
+                        //     style: GoogleFonts.poppins(
+                        //         fontSize: 12,
+                        //         fontWeight: FontWeight.w700,
+                        //         color: Colors.black
+                        //     ),
+                        //   ),
+                        // ),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(

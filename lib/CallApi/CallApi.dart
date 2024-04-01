@@ -1,7 +1,10 @@
 import 'dart:convert' as convert;
 import 'dart:convert';
 import 'package:http/http.dart' as http ;
+import 'package:ppm/model/hospitalmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../model/userHospital.dart';
 
 
 
@@ -147,12 +150,80 @@ class CallApi{
     );
   }
 
+  static Future<List<Hospital>> getHospital()async{
+
+    final listurl = 'http://10.0.2.2:8000/api/hospitals';
+
+    final response = await http.post(Uri.parse(listurl));
+    final body = json.decode(response.body);
+    // final pref = await SharedPreferences.getInstance();
+    // pref.setStringList('cname',[body['name']]);
+    //print('******');
+    //print(body);
+    //print(body.map<QuestionModel>(QuestionModel.fromJson).toList());
+    print(body.map<Hospital>(Hospital.fromJson).toList());
+    return body.map<Hospital>(Hospital.fromJson).toList();
+  }
+  addHospital(data,apiURL) async{
+    String fullUrl = 'http://10.0.2.2:8000/api/addhospital';
+
+    print(convert.jsonEncode(data));
+    return await http.post(
+        Uri.parse(fullUrl),
+        body: convert.jsonEncode(data),
+        headers: _setHeaders()
+    );
+  }
+  static Future<List<userHospital>> getUserHospital(String selectedHospital) async {
+
+    final listurl = 'http://10.0.2.2:8000/api/hospitaluser?hospital=' + selectedHospital;
+    final response = await http.post(Uri.parse(listurl));
+    final body = json.decode(response.body);
+
+    // Check if the response body contains the 'data' key
+    if (body.containsKey('data')) {
+      // Parse the 'data' key
+      final dataList = body['data'] as List;
+      // Map each item in the list to your model
+      List<userHospital> hospitals = dataList.map((e) => userHospital.fromJson(e)).toList();
+      return hospitals;
+    } else {
+      // Handle error case when 'data' key is not found
+      throw Exception('Data key not found in response');
+    }
+  }
+
+  // static Future<List<userHospital>> getUserHospital(String selectedHospital) async {
+  //   final url = 'http://10.0.2.2:8000/api/hospitaluser?hospital=$selectedHospital';
+  //   print(url);
+  //   final response = await http.post(
+  //     Uri.parse(url),
+  //     headers: {'Content-Type': 'application/json'},
+  //   );
+  //
+  //   if (response.statusCode == 200) {
+  //     final dynamic responseBody = json.decode(response.body);
+  //     if (responseBody is List) {
+  //       List<userHospital> users = responseBody.map((json) => userHospital.fromJson(json)).toList();
+  //       return users;
+  //     } else {
+  //       throw Exception('Unexpected response format');
+  //     }
+  //   } else {
+  //     throw Exception('Failed to load users');
+  //   }
+  // }
+
+
+
+
 
 
   _setHeaders() => {
     'Content-type' : 'application/json',
     'Accept' : 'application/json',
   };
+
 
 
 

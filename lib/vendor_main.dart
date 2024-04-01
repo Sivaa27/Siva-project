@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ppm/newHospital.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'addEquip.dart';
+import 'newUser.dart';
 
 class vendorMain extends StatefulWidget {
   const vendorMain({super.key});
@@ -234,6 +236,86 @@ class _vendorMainState extends State<vendorMain> {
                       // Navigator.push(context,
                       //     MaterialPageRoute(builder:(context)=>MyApplication())
                       // );
+                    },),
+                  GestureDetector(
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                                offset: const Offset(0, 5),
+                                color: Theme.of(context).primaryColor.withOpacity(.2),
+                                spreadRadius: 2,
+                                blurRadius: 5
+                            )
+                          ]
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.deepOrange,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(CupertinoIcons.person, color: Colors.white)
+                          ),
+                          const SizedBox(height: 8),
+                          Text('Add new User',
+                              textAlign:TextAlign.center,
+                              style: GoogleFonts.taiHeritagePro(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.black))
+                        ],
+                      ),
+                    ),
+                    onTap: (){
+                       Navigator.push(context,
+                           MaterialPageRoute(builder:(context)=>newUser())
+                       );
+                    },),
+                  GestureDetector(
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                                offset: const Offset(0, 5),
+                                color: Theme.of(context).primaryColor.withOpacity(.2),
+                                spreadRadius: 2,
+                                blurRadius: 5
+                            )
+                          ]
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.deepOrange,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(CupertinoIcons.building_2_fill, color: Colors.white)
+                          ),
+                          const SizedBox(height: 8),
+                          Text('Add new Hospital',
+                              textAlign:TextAlign.center,
+                              style: GoogleFonts.taiHeritagePro(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.black))
+                        ],
+                      ),
+                    ),
+                    onTap: (){
+                      Navigator.push(context,
+                          MaterialPageRoute(builder:(context)=>newHospital())
+                      );
                     },),
                 ],
               ),
