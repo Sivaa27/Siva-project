@@ -1,6 +1,7 @@
 import 'dart:convert' as convert;
 import 'dart:convert';
 import 'package:http/http.dart' as http ;
+import 'package:ppm/addEquip.dart';
 import 'package:ppm/model/hospitalmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -191,6 +192,17 @@ class CallApi{
       // Handle error case when 'data' key is not found
       throw Exception('Data key not found in response');
     }
+  }
+
+  addEquip(data,apiURL) async{
+    String fullUrl = 'http://10.0.2.2:8000/api/register';
+
+    print(convert.jsonEncode(data));
+    return await http.post(
+        Uri.parse(fullUrl),
+        body: convert.jsonEncode(data),
+        headers: _setHeaders()
+    );
   }
 
   // static Future<List<userHospital>> getUserHospital(String selectedHospital) async {

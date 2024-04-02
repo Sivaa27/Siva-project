@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:ppm/vendor_main.dart';
 
 import 'CallApi/CallApi.dart';
 import 'auth/login.dart';
@@ -53,6 +54,11 @@ class _addEquipState extends State<addEquip> {
   List<String> equipmentTypes = ['Type B', 'Type BF', 'Type CF'];
   String? selectedEquipmentType;
   String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  String? selectedUserEmail; // Nullable selected user email
+  String? selectedUserName; // Nullable selected user email
+  String? selectedHospitalName; // Nullable selected user email
+  String? selectedType; // Nullable selected type
+  String? selectedClass; // Nullable selected class
 
   @override
   void initState() {
@@ -346,6 +352,91 @@ class _addEquipState extends State<addEquip> {
                                   ),
                                   dropdownColor: Colors.black,
                                 ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Equipment Department',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    TextFormField(
+                                      validator: (val) {
+                                        if (val == null || val.isEmpty) {
+                                          return 'Please Enter Equipment Department';
+                                        }
+                                        return null;
+                                      },
+                                      onChanged: (val) {
+                                        eqdepart = val;
+                                      },
+                                      style: TextStyle(color: Colors.white),
+                                      decoration: InputDecoration(
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(Radius.circular(40)),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        enabledBorder: UnderlineInputBorder(
+                                          borderRadius: BorderRadius.all(Radius.circular(40)),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        prefixIcon: Icon(
+                                          Icons.business,
+                                          color: Colors.white,
+                                        ),
+                                        hintText: 'Equipment Department',
+                                        hintStyle: const TextStyle(color: Colors.white),
+                                      ),
+                                    ), // Equipment Department
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 30,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Equipment Ward',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    TextFormField(
+                                      validator: (val) {
+                                        if (val == null || val.isEmpty) {
+                                          return 'Please Enter Equipment Ward';
+                                        }
+                                        return null;
+                                      },
+                                      onChanged: (val) {
+                                        eqward = val;
+                                      },
+                                      style: TextStyle(color: Colors.white),
+                                      decoration: InputDecoration(
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(Radius.circular(40)),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        enabledBorder: UnderlineInputBorder(
+                                          borderRadius: BorderRadius.all(Radius.circular(40)),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        prefixIcon: Icon(
+                                          Icons.business_center,
+                                          color: Colors.white,
+                                        ),
+                                        hintText: 'Equipment Ward',
+                                        hintStyle: const TextStyle(color: Colors.white),
+                                      ),
+                                    ), // Equipment Ward
+                                  ],
+                                ),
                                 const SizedBox(
                                     height: 30), // Equipment Hospital
                                 users.isEmpty
@@ -360,6 +451,7 @@ class _addEquipState extends State<addEquip> {
                                             setState(() {
                                               selectedUser =
                                                   newValue; // Update selected user
+                                              _updateSelectedUserEmail(); // Update selectedUserEmail
                                             });
                                           },
                                           validator: (value) {
@@ -559,33 +651,55 @@ class _addEquipState extends State<addEquip> {
     );
   }
 
+  void _updateSelectedUserEmail() {
+    setState(() {
+      selectedUserEmail = selectedUser?.email;
+      selectedUserName=selectedUser?.name;
+      selectedHospitalName=selectedHospital?.name;
+
+    });
+  }
+
   _register() async {
-    String token = 'test';
+    print(eqname);
+    print(eqserial);
+    print(eqmanuf);
+    print(selectedHospitalName);
+    print(eqdepart);
+    print(eqward);
+    print(selectedUserName);
+    print(eqclass);
+    print(eqtype);
+    print(selectedUserEmail);
+    print(selectedUserName);
     var data = {
-      //'name':name,
-      //'email':email,
-      //'hospital':hospital,
-      //'password':password,
-      //'token':token,
+      'eq_name':eqname,
+      'eq_serial':eqserial,
+      'eq_manuf':eqmanuf,
+      'eq_hospital':selectedHospitalName,
+      'eq_department':eqdepart,
+      'eq_ward':eqward,
+      'eq_pic':selectedUserName,
+      'eq_class':eqclass,
+      'eq_type':eqtype,
+      'email':selectedUserEmail,
+      'name':selectedUserName,
+
     };
 
-    if (eqhosp == eqclass) {
-      var res = await CallApi().RegisterData(data, 'register');
-      var getVal = json.decode(res.body);
+      //var res = await CallApi().addEquip(data, 'addEquip');
+      //var getVal = json.decode(res.body);
 
-      if (getVal['success']) {
-        Fluttertoast.showToast(msg: "Account created Successfully.");
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => loginScreen()),
-        );
-      } else {
-        Fluttertoast.showToast(
-          msg: getVal['message'] ?? "Account failed to create.",
-        );
-      }
-    } else {
-      Fluttertoast.showToast(msg: "Password doesn't match.");
-    }
+      // if (getVal['success']) {
+      //   Fluttertoast.showToast(msg: "Equipment created Successfully.");
+      //   Navigator.push(
+      //     context,
+      //     MaterialPageRoute(builder: (context) => vendorMain()),
+      //   );
+      // } else {
+      //   Fluttertoast.showToast(
+      //     msg: getVal['message'] ?? "Equipment failed to create.",
+      //   );
+      // }
   }
 }

@@ -47,7 +47,7 @@ class _vendorMainState extends State<vendorMain> {
                 const SizedBox(height: 50),
                 ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 30),
-                  title: Text('Helloo, $getName!', style: GoogleFonts.caveat(
+                  title: Text('Hello, $getName!', style: GoogleFonts.caveat(
                       fontSize: 28,
                       fontWeight: FontWeight.w700,
                       fontStyle: FontStyle.italic,
@@ -59,6 +59,7 @@ class _vendorMainState extends State<vendorMain> {
                       fontStyle: FontStyle.italic,
                       color: Colors.white
                   ),),
+
                 ),
                 const SizedBox(height: 30)
               ],
