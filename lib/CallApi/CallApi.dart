@@ -2,6 +2,7 @@ import 'dart:convert' as convert;
 import 'dart:convert';
 import 'package:http/http.dart' as http ;
 import 'package:ppm/addEquip.dart';
+import 'package:ppm/model/equipmentmodel.dart';
 import 'package:ppm/model/hospitalmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -195,7 +196,7 @@ class CallApi{
   }
 
   addEquip(data,apiURL) async{
-    String fullUrl = 'http://10.0.2.2:8000/api/register';
+    String fullUrl = 'http://10.0.2.2:8000/api/addequip';
 
     print(convert.jsonEncode(data));
     return await http.post(
@@ -203,6 +204,31 @@ class CallApi{
         body: convert.jsonEncode(data),
         headers: _setHeaders()
     );
+  }
+
+  static Future<List<Equipment>> searchEquip()async{
+
+    final listurl = 'http://10.0.2.2:8000/api/equipmentquery';
+    final response = await http.post(Uri.parse(listurl));
+    final body = json.decode(response.body);
+    print('******');
+    print(body);
+    print(body.map<Equipment>(Equipment.fromJson).toList());
+    return body.map<Equipment>(Equipment.fromJson).toList();
+  }
+
+  updateEquipment(data,apiURL,id) async{
+
+
+    String fullUrl = 'http://10.0.2.2:8000/api/updateEquip/$id';
+    print(fullUrl);
+    print(convert.jsonEncode(data));
+    return await http.post(
+        Uri.parse(fullUrl),
+        body: convert.jsonEncode(data),
+        headers: _setHeaders()
+    );
+
   }
 
   // static Future<List<userHospital>> getUserHospital(String selectedHospital) async {

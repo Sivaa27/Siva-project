@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ppm/newHospital.dart';
+import 'package:ppm/searchQuery.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'addEquip.dart';
@@ -154,9 +155,9 @@ class _vendorMainState extends State<vendorMain> {
                       ),
                     ),
                     onTap: (){
-                      // Navigator.push(context,
-                      //     MaterialPageRoute(builder:(context)=>MyBooking_Page())
-                      // );
+                      Navigator.push(context,
+                          MaterialPageRoute(builder:(context)=>searchQuery())
+                      );
                     },),
                   GestureDetector(
                     child: Container(

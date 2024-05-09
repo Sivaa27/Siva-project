@@ -40,6 +40,7 @@ class _addEquipState extends State<addEquip> {
   String eqpic = '';
   String eqclass = '';
   String eqtype = '';
+  String nextYearDate1='';
   List<Hospital>? hospitals; // List to hold hospitals
   Hospital? selectedHospital; // Nullable selected hospital
   List<String> equipmentClasses = [
@@ -54,6 +55,7 @@ class _addEquipState extends State<addEquip> {
   List<String> equipmentTypes = ['Type B', 'Type BF', 'Type CF'];
   String? selectedEquipmentType;
   String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  DateTime currentDate = DateTime.now();
   String? selectedUserEmail; // Nullable selected user email
   String? selectedUserName; // Nullable selected user email
   String? selectedHospitalName; // Nullable selected user email
@@ -661,18 +663,21 @@ class _addEquipState extends State<addEquip> {
   }
 
   _register() async {
-    print(eqname);
-    print(eqserial);
-    print(eqmanuf);
-    print(selectedHospitalName);
-    print(eqdepart);
-    print(eqward);
-    print(selectedUserName);
-    print(eqclass);
-    print(eqtype);
-    print(selectedUserEmail);
-    print(selectedUserName);
+    DateTime nextYearDate = DateTime(currentDate.year + 1, currentDate.month, currentDate.day);
+    nextYearDate1 = DateFormat('yyyy-MM-dd').format(nextYearDate);
+    // print(eqname);
+    // print(eqserial);
+    // print(eqmanuf);
+    // print(selectedHospitalName);
+    // print(eqdepart);
+    // print(eqward);
+    // print(selectedUserName);
+    // print(selectedEquipmentClass);
+    // print(selectedEquipmentType);
+    // print(selectedUserEmail);
+    // print(selectedUserName);
     var data = {
+
       'eq_name':eqname,
       'eq_serial':eqserial,
       'eq_manuf':eqmanuf,
@@ -680,26 +685,27 @@ class _addEquipState extends State<addEquip> {
       'eq_department':eqdepart,
       'eq_ward':eqward,
       'eq_pic':selectedUserName,
-      'eq_class':eqclass,
-      'eq_type':eqtype,
+      'eq_class':selectedEquipmentClass,
+      'eq_type':selectedEquipmentType,
       'email':selectedUserEmail,
       'name':selectedUserName,
-
+      'date':formattedDate,
+      'nextdate': nextYearDate1,
     };
 
-      //var res = await CallApi().addEquip(data, 'addEquip');
-      //var getVal = json.decode(res.body);
+      var res = await CallApi().addEquip(data, 'addEquip');
+      var getVal = json.decode(res.body);
 
-      // if (getVal['success']) {
-      //   Fluttertoast.showToast(msg: "Equipment created Successfully.");
-      //   Navigator.push(
-      //     context,
-      //     MaterialPageRoute(builder: (context) => vendorMain()),
-      //   );
-      // } else {
-      //   Fluttertoast.showToast(
-      //     msg: getVal['message'] ?? "Equipment failed to create.",
-      //   );
-      // }
+      if (getVal['success']) {
+        Fluttertoast.showToast(msg: "Equipment created Successfully.");
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => vendorMain()),
+        );
+      } else {
+        Fluttertoast.showToast(
+          msg: getVal['message'] ?? "Equipment failed to create.",
+        );
+      }
   }
 }

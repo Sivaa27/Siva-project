@@ -231,38 +231,50 @@ class _newUserState extends State<newUser> {
                       ),
 
                       // Hospital dropdown
+// Hospital dropdown
                       hospitals == null
                           ? Center(child: CircularProgressIndicator()) // Show a loading indicator while hospitals are being fetched
-                          : DropdownButtonFormField<Hospital>(
-                        value: selectedHospital,
-                        onChanged: (Hospital? newValue) {
-                          setState(() {
-                            selectedHospital = newValue;
-                          });
-                        },
-                        items: hospitals!.map<DropdownMenuItem<Hospital>>((Hospital value) {
-                          return DropdownMenuItem<Hospital>(
-                            value: value,
-                            child: Text(value.name),
-                          );
-                        }).toList(),
-                        decoration: InputDecoration(
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(40)),
-                            borderSide: BorderSide.none,
+                          : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          DropdownButtonFormField<Hospital>(
+                            value: selectedHospital,
+                            onChanged: (Hospital? newValue) {
+                              setState(() {
+                                selectedHospital = newValue;
+                              });
+                            },
+                            items: hospitals!.map<DropdownMenuItem<Hospital>>((Hospital value) {
+                              return DropdownMenuItem<Hospital>(
+                                value: value,
+                                child: Text(value.name),
+                              );
+                            }).toList(),
+                            decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(40)),
+                                borderSide: BorderSide.none,
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(40)),
+                                borderSide: BorderSide.none,
+                              ),
+                              prefixIcon: Icon(
+                                Icons.card_membership,
+                                color: Colors.white,
+                              ),
+                              hintText: 'Select Hospital',
+                              hintStyle: const TextStyle(color: Colors.white),
+                            ),
                           ),
-                          enabledBorder: UnderlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(40)),
-                            borderSide: BorderSide.none,
+                          SizedBox(height: 10),
+                          Text(
+                            "Can't find your hospital? Add new hospital.",
+                            style: TextStyle(color: Colors.white, fontSize: 12),
                           ),
-                          prefixIcon: Icon(
-                            Icons.card_membership,
-                            color: Colors.white,
-                          ),
-                          hintText: 'Select Hospital',
-                          hintStyle: const TextStyle(color: Colors.white),
-                        ),
+                        ],
                       ),
+
                       const SizedBox(height: 30),
 
                       // Register button...
