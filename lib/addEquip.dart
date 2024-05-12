@@ -3,13 +3,14 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:ppm/vendor_main.dart';
 
+import 'AddRefIdPage.dart';
 import 'CallApi/CallApi.dart';
 import 'auth/login.dart';
 import 'model/hospitalmodel.dart';
 import 'model/userHospital.dart';
-import 'package:intl/intl.dart';
 
 class addEquip extends StatefulWidget {
   const addEquip({Key? key}) : super(key: key);
@@ -160,12 +161,12 @@ class _addEquipState extends State<addEquip> {
                             decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
+                                BorderRadius.all(Radius.circular(40)),
                                 borderSide: BorderSide.none,
                               ),
                               enabledBorder: UnderlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
+                                BorderRadius.all(Radius.circular(40)),
                                 borderSide: BorderSide.none,
                               ),
                               prefixIcon: Icon(
@@ -262,17 +263,17 @@ class _addEquipState extends State<addEquip> {
                           TextFormField(
                             enabled: false, // Make it non-editable
                             initialValue:
-                                formattedDate, // Set the initial value to today's date
+                            formattedDate, // Set the initial value to today's date
                             style: TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
+                                BorderRadius.all(Radius.circular(40)),
                                 borderSide: BorderSide.none,
                               ),
                               enabledBorder: UnderlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
+                                BorderRadius.all(Radius.circular(40)),
                                 borderSide: BorderSide.none,
                               ),
                               prefixIcon: Icon(
@@ -290,41 +291,187 @@ class _addEquipState extends State<addEquip> {
                       ),
                       hospitals == null
                           ? Center(
-                              child:
-                                  CircularProgressIndicator()) // Show a loading indicator while hospitals are being fetched
+                          child:
+                          CircularProgressIndicator()) // Show a loading indicator while hospitals are being fetched
                           : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Assign Hospital and PIC', // Explanation of the hospital dropdown
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Assign Hospital and PIC', // Explanation of the hospital dropdown
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          DropdownButtonFormField<Hospital>(
+                            value: selectedHospital,
+                            onChanged: (Hospital? newValue) {
+                              setState(() {
+                                selectedHospital = newValue;
+                                // Fetch users based on selected hospital
+                                _fetchUsers(selectedHospital!.name);
+                              });
+                            },
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please select a hospital';
+                              }
+                              return null;
+                            },
+                            items: hospitals!
+                                .map<DropdownMenuItem<Hospital>>(
+                                    (Hospital value) {
+                                  return DropdownMenuItem<Hospital>(
+                                    value: value,
+                                    child: Text(
+                                      value.name,
+                                      style: TextStyle(
+                                        color: Colors
+                                            .white, // Set text color to white
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                            decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(40)),
+                                borderSide: BorderSide.none,
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(40)),
+                                borderSide: BorderSide.none,
+                              ),
+                              prefixIcon: Icon(
+                                Icons.card_membership,
+                                color: Colors.white,
+                              ),
+                              hintText: 'Select Hospital',
+                              hintStyle:
+                              const TextStyle(color: Colors.white),
+                              fillColor: Colors.grey.shade100,
+                            ),
+                            dropdownColor: Colors.black,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Equipment Department',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
                                 ),
-                                SizedBox(height: 10),
-                                DropdownButtonFormField<Hospital>(
-                                  value: selectedHospital,
-                                  onChanged: (Hospital? newValue) {
-                                    setState(() {
-                                      selectedHospital = newValue;
-                                      // Fetch users based on selected hospital
-                                      _fetchUsers(selectedHospital!.name);
-                                    });
-                                  },
-                                  validator: (value) {
-                                    if (value == null) {
-                                      return 'Please select a hospital';
-                                    }
-                                    return null;
-                                  },
-                                  items: hospitals!
-                                      .map<DropdownMenuItem<Hospital>>(
-                                          (Hospital value) {
-                                    return DropdownMenuItem<Hospital>(
-                                      value: value,
+                              ),
+                              SizedBox(height: 10),
+                              TextFormField(
+                                validator: (val) {
+                                  if (val == null || val.isEmpty) {
+                                    return 'Please Enter Equipment Department';
+                                  }
+                                  return null;
+                                },
+                                onChanged: (val) {
+                                  eqdepart = val;
+                                },
+                                style: TextStyle(color: Colors.white),
+                                decoration: InputDecoration(
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(40)),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(40)),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  prefixIcon: Icon(
+                                    Icons.business,
+                                    color: Colors.white,
+                                  ),
+                                  hintText: 'Equipment Department',
+                                  hintStyle: const TextStyle(color: Colors.white),
+                                ),
+                              ), // Equipment Department
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Equipment Ward',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              TextFormField(
+                                validator: (val) {
+                                  if (val == null || val.isEmpty) {
+                                    return 'Please Enter Equipment Ward';
+                                  }
+                                  return null;
+                                },
+                                onChanged: (val) {
+                                  eqward = val;
+                                },
+                                style: TextStyle(color: Colors.white),
+                                decoration: InputDecoration(
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(40)),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(40)),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  prefixIcon: Icon(
+                                    Icons.business_center,
+                                    color: Colors.white,
+                                  ),
+                                  hintText: 'Equipment Ward',
+                                  hintStyle: const TextStyle(color: Colors.white),
+                                ),
+                              ), // Equipment Ward
+                            ],
+                          ),
+                          const SizedBox(
+                              height: 30), // Equipment Hospital
+                          users.isEmpty
+                              ? Center(child: CircularProgressIndicator())
+                              : IgnorePointer(
+                            ignoring: users.isEmpty,
+                            child: DropdownButtonFormField<
+                                userHospital>(
+                              value:
+                              selectedUser, // Set initial value to selected user
+                              onChanged: (userHospital? newValue) {
+                                setState(() {
+                                  selectedUser =
+                                      newValue; // Update selected user
+                                  _updateSelectedUserEmail(); // Update selectedUserEmail
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please select a user';
+                                }
+                                return null;
+                              },
+                              items: users.map<
+                                  DropdownMenuItem<
+                                      userHospital>>(
+                                      (userHospital user) {
+                                    return DropdownMenuItem<
+                                        userHospital>(
+                                      value: user,
                                       child: Text(
-                                        value.name,
+                                        user.name,
                                         style: TextStyle(
                                           color: Colors
                                               .white, // Set text color to white
@@ -332,177 +479,31 @@ class _addEquipState extends State<addEquip> {
                                       ),
                                     );
                                   }).toList(),
-                                  decoration: InputDecoration(
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(40)),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    enabledBorder: UnderlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(40)),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.card_membership,
-                                      color: Colors.white,
-                                    ),
-                                    hintText: 'Select Hospital',
-                                    hintStyle:
-                                        const TextStyle(color: Colors.white),
-                                    fillColor: Colors.grey.shade100,
-                                  ),
-                                  dropdownColor: Colors.black,
+                              decoration: InputDecoration(
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                      Radius.circular(40)),
+                                  borderSide: BorderSide.none,
                                 ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Equipment Department',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    SizedBox(height: 10),
-                                    TextFormField(
-                                      validator: (val) {
-                                        if (val == null || val.isEmpty) {
-                                          return 'Please Enter Equipment Department';
-                                        }
-                                        return null;
-                                      },
-                                      onChanged: (val) {
-                                        eqdepart = val;
-                                      },
-                                      style: TextStyle(color: Colors.white),
-                                      decoration: InputDecoration(
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(Radius.circular(40)),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        enabledBorder: UnderlineInputBorder(
-                                          borderRadius: BorderRadius.all(Radius.circular(40)),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        prefixIcon: Icon(
-                                          Icons.business,
-                                          color: Colors.white,
-                                        ),
-                                        hintText: 'Equipment Department',
-                                        hintStyle: const TextStyle(color: Colors.white),
-                                      ),
-                                    ), // Equipment Department
-                                  ],
+                                enabledBorder: UnderlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                      Radius.circular(40)),
+                                  borderSide: BorderSide.none,
                                 ),
-                                const SizedBox(
-                                  height: 30,
+                                prefixIcon: Icon(
+                                  Icons.card_membership,
+                                  color: Colors.white,
                                 ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Equipment Ward',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    SizedBox(height: 10),
-                                    TextFormField(
-                                      validator: (val) {
-                                        if (val == null || val.isEmpty) {
-                                          return 'Please Enter Equipment Ward';
-                                        }
-                                        return null;
-                                      },
-                                      onChanged: (val) {
-                                        eqward = val;
-                                      },
-                                      style: TextStyle(color: Colors.white),
-                                      decoration: InputDecoration(
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(Radius.circular(40)),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        enabledBorder: UnderlineInputBorder(
-                                          borderRadius: BorderRadius.all(Radius.circular(40)),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        prefixIcon: Icon(
-                                          Icons.business_center,
-                                          color: Colors.white,
-                                        ),
-                                        hintText: 'Equipment Ward',
-                                        hintStyle: const TextStyle(color: Colors.white),
-                                      ),
-                                    ), // Equipment Ward
-                                  ],
-                                ),
-                                const SizedBox(
-                                    height: 30), // Equipment Hospital
-                                users.isEmpty
-                                    ? Center(child: CircularProgressIndicator())
-                                    : IgnorePointer(
-                                        ignoring: users.isEmpty,
-                                        child: DropdownButtonFormField<
-                                            userHospital>(
-                                          value:
-                                              selectedUser, // Set initial value to selected user
-                                          onChanged: (userHospital? newValue) {
-                                            setState(() {
-                                              selectedUser =
-                                                  newValue; // Update selected user
-                                              _updateSelectedUserEmail(); // Update selectedUserEmail
-                                            });
-                                          },
-                                          validator: (value) {
-                                            if (value == null) {
-                                              return 'Please select a user';
-                                            }
-                                            return null;
-                                          },
-                                          items: users.map<
-                                                  DropdownMenuItem<
-                                                      userHospital>>(
-                                              (userHospital user) {
-                                            return DropdownMenuItem<
-                                                userHospital>(
-                                              value: user,
-                                              child: Text(
-                                                user.name,
-                                                style: TextStyle(
-                                                  color: Colors
-                                                      .white, // Set text color to white
-                                                ),
-                                              ),
-                                            );
-                                          }).toList(),
-                                          decoration: InputDecoration(
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(40)),
-                                              borderSide: BorderSide.none,
-                                            ),
-                                            enabledBorder: UnderlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(40)),
-                                              borderSide: BorderSide.none,
-                                            ),
-                                            prefixIcon: Icon(
-                                              Icons.card_membership,
-                                              color: Colors.white,
-                                            ),
-                                            hintText: 'Select User',
-                                            hintStyle: const TextStyle(
-                                                color: Colors.white),
-                                            fillColor: Colors.grey.shade100,
-                                          ),
-                                          dropdownColor: Colors.black,
-                                        ),
-                                      ),
-                              ],
+                                hintText: 'Select Person-in-Charge',
+                                hintStyle: const TextStyle(
+                                    color: Colors.white),
+                                fillColor: Colors.grey.shade100,
+                              ),
+                              dropdownColor: Colors.black,
                             ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 30), // User Dropdown
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -536,7 +537,7 @@ class _addEquipState extends State<addEquip> {
                                   value,
                                   style: TextStyle(
                                     color:
-                                        Colors.white, // Set text color to white
+                                    Colors.white, // Set text color to white
                                   ),
                                 ),
                               );
@@ -544,12 +545,12 @@ class _addEquipState extends State<addEquip> {
                             decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
+                                BorderRadius.all(Radius.circular(40)),
                                 borderSide: BorderSide.none,
                               ),
                               enabledBorder: UnderlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
+                                BorderRadius.all(Radius.circular(40)),
                                 borderSide: BorderSide.none,
                               ),
                               prefixIcon: Icon(
@@ -584,7 +585,7 @@ class _addEquipState extends State<addEquip> {
                                   value,
                                   style: TextStyle(
                                     color:
-                                        Colors.white, // Set text color to white
+                                    Colors.white, // Set text color to white
                                   ),
                                 ),
                               );
@@ -592,12 +593,12 @@ class _addEquipState extends State<addEquip> {
                             decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
+                                BorderRadius.all(Radius.circular(40)),
                                 borderSide: BorderSide.none,
                               ),
                               enabledBorder: UnderlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
+                                BorderRadius.all(Radius.circular(40)),
                                 borderSide: BorderSide.none,
                               ),
                               prefixIcon: Icon(
@@ -631,7 +632,23 @@ class _addEquipState extends State<addEquip> {
                               color: Colors.white,
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
-                                  _register();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AddRefIDPage(
+                                          eqname: eqname,
+                                          eqserial: eqserial,
+                                          eqmanuf: eqmanuf,
+                                          eqdepart: eqdepart,
+                                          eqward: eqward,
+                                          selectedUserName: selectedUserName,
+                                          selectedHospitalName: selectedHospitalName,
+                                          selectedEquipmentClass: selectedEquipmentClass,
+                                          selectedEquipmentType: selectedEquipmentType,
+                                          selectedUserEmail: selectedUserEmail,
+                                          formattedDate: formattedDate,
+                                        )),
+                                  );
                                 }
                               },
                               icon: const Icon(Icons.arrow_forward),
@@ -656,56 +673,10 @@ class _addEquipState extends State<addEquip> {
   void _updateSelectedUserEmail() {
     setState(() {
       selectedUserEmail = selectedUser?.email;
-      selectedUserName=selectedUser?.name;
-      selectedHospitalName=selectedHospital?.name;
-
+      selectedUserName = selectedUser?.name;
+      selectedHospitalName = selectedHospital?.name;
     });
   }
 
-  _register() async {
-    DateTime nextYearDate = DateTime(currentDate.year + 1, currentDate.month, currentDate.day);
-    nextYearDate1 = DateFormat('yyyy-MM-dd').format(nextYearDate);
-    // print(eqname);
-    // print(eqserial);
-    // print(eqmanuf);
-    // print(selectedHospitalName);
-    // print(eqdepart);
-    // print(eqward);
-    // print(selectedUserName);
-    // print(selectedEquipmentClass);
-    // print(selectedEquipmentType);
-    // print(selectedUserEmail);
-    // print(selectedUserName);
-    var data = {
 
-      'eq_name':eqname,
-      'eq_serial':eqserial,
-      'eq_manuf':eqmanuf,
-      'eq_hospital':selectedHospitalName,
-      'eq_department':eqdepart,
-      'eq_ward':eqward,
-      'eq_pic':selectedUserName,
-      'eq_class':selectedEquipmentClass,
-      'eq_type':selectedEquipmentType,
-      'email':selectedUserEmail,
-      'name':selectedUserName,
-      'date':formattedDate,
-      'nextdate': nextYearDate1,
-    };
-
-      var res = await CallApi().addEquip(data, 'addEquip');
-      var getVal = json.decode(res.body);
-
-      if (getVal['success']) {
-        Fluttertoast.showToast(msg: "Equipment created Successfully.");
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => vendorMain()),
-        );
-      } else {
-        Fluttertoast.showToast(
-          msg: getVal['message'] ?? "Equipment failed to create.",
-        );
-      }
-  }
 }
