@@ -4,11 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:ppm/CallApi/CallApi.dart';
 import 'package:ppm/NavPage.dart';
-import 'package:ppm/auth/register.dart';
 import '../forgetPassword.dart';
-import 'local_auth_service.dart';
 
 class loginScreen extends StatefulWidget {
   const loginScreen({Key? key}) : super(key: key);
@@ -18,32 +17,43 @@ class loginScreen extends StatefulWidget {
 }
 
 class _loginScreenState extends State<loginScreen> {
+  final LocalAuthentication auth = LocalAuthentication();
   bool authenticated = false;
   final _formKey = GlobalKey<FormState>();
   String email = '';
-  String hospital = '';
   String password = '';
   String getName = '';
-  String getHospital='';
-  String getPassword='';
-  String id ='';
+  String getPassword = '';
   Color enabled = const Color.fromARGB(255, 63, 56, 89);
   Color enabledtxt = Colors.white;
   Color deaible = Colors.grey;
   Color backgroundColor = const Color(0xFF1F1A30);
-  var buttonVisible=false;
+  var buttonVisible = false;
 
   @override
-  void initState()  {
+  void initState() {
     super.initState();
-    // setName=UserSharedPreference.getName();
-    WidgetsBinding.instance?.addPostFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _get();
-      setState(() {
-        build(context);
-      });
     });
+  }
 
+  Future<void> _authenticate() async {
+    try {
+      authenticated = await auth.authenticate(
+        localizedReason: 'Please authenticate to login',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+        ),
+      );
+    } on PlatformException catch (e) {
+      print(e);
+    }
+    if (!mounted) return;
+
+    setState(() {
+      authenticated = authenticated ? true : false;
+    });
   }
 
   @override
@@ -51,10 +61,8 @@ class _loginScreenState extends State<loginScreen> {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-            image:AssetImage(
-                "assets/images/cbg.png"
-            ),
-            fit:BoxFit.cover,
+            image: AssetImage("assets/images/cbg.png"),
+            fit: BoxFit.cover,
             opacity: 0.3),
       ),
       child: Scaffold(
@@ -68,8 +76,7 @@ class _loginScreenState extends State<loginScreen> {
                   fontSize: 48,
                   fontWeight: FontWeight.w700,
                   fontStyle: FontStyle.italic,
-                  color: Colors.white
-              ),
+                  color: Colors.white),
             ),
           ),
           SizedBox(height: 20,),
@@ -81,8 +88,7 @@ class _loginScreenState extends State<loginScreen> {
                   fontSize: 48,
                   fontWeight: FontWeight.w700,
                   fontStyle: FontStyle.italic,
-                  color: Colors.white
-              ),
+                  color: Colors.white),
             ),
           ),
           SingleChildScrollView(
@@ -92,10 +98,7 @@ class _loginScreenState extends State<loginScreen> {
                 padding: EdgeInsets.only(
                     right: 35,
                     left: 35,
-                    top: MediaQuery
-                        .of(context)
-                        .size
-                        .height * 0.4),
+                    top: MediaQuery.of(context).size.height * 0.4),
                 child: Column(children: [
                   TextFormField(
                     validator: (val) {
@@ -153,7 +156,7 @@ class _loginScreenState extends State<loginScreen> {
                           borderRadius:
                           BorderRadius.all(Radius.circular(40))),
                       prefixIcon: Icon(
-                        Icons.person,
+                        Icons.lock,
                         color: Colors.black,
                       ),
                       fillColor: Colors.grey.shade100,
@@ -169,7 +172,6 @@ class _loginScreenState extends State<loginScreen> {
                     height: 40,
                   ),
                   Row(
-                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SizedBox(width: 85,),
                       ElevatedButton(
@@ -180,7 +182,7 @@ class _loginScreenState extends State<loginScreen> {
                             padding: EdgeInsets.symmetric(
                                 horizontal: MediaQuery.of(context).size.width / 6.3, vertical: 15)
                         ),
-                        onPressed: (){
+                        onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             _login();
                           }
@@ -190,8 +192,7 @@ class _loginScreenState extends State<loginScreen> {
                           style: GoogleFonts.poppins(
                               fontSize: 19,
                               fontWeight: FontWeight.w700,
-                              color: Colors.black
-                          ),
+                              color: Colors.black),
                         ),
                       )
                     ],
@@ -203,10 +204,6 @@ class _loginScreenState extends State<loginScreen> {
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Text(
-                          //   "Don't have an account?",
-                          //   style: TextStyle(color: Colors.white, fontSize: 13),
-                          // ),
                           Text(
                             "Forgot your password?",
                             style: TextStyle(color: Colors.white, fontSize: 13),
@@ -216,28 +213,6 @@ class _loginScreenState extends State<loginScreen> {
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // ElevatedButton(
-                        //   style: ElevatedButton.styleFrom(
-                        //       shape: RoundedRectangleBorder(
-                        //           borderRadius: BorderRadius.circular(40.0)),
-                        //       backgroundColor: Colors.white,
-                        //       padding: EdgeInsets.symmetric(
-                        //           horizontal: MediaQuery.of(context).size.width / 10, vertical: 10)
-                        //   ),
-                        //   onPressed: (){
-                        //     Navigator.push(context,
-                        //         MaterialPageRoute(builder: (context) => registerScreen())
-                        //     );
-                        //   },
-                        //   child: Text(
-                        //     'Sign Up',
-                        //     style: GoogleFonts.poppins(
-                        //         fontSize: 12,
-                        //         fontWeight: FontWeight.w700,
-                        //         color: Colors.black
-                        //     ),
-                        //   ),
-                        // ),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
@@ -246,48 +221,38 @@ class _loginScreenState extends State<loginScreen> {
                               padding: EdgeInsets.symmetric(
                                   horizontal: MediaQuery.of(context).size.width / 30, vertical: 10)
                           ),
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) => forgetPassword())
                             );
                           },
                           child: Text(
                             'Reset Password',
-                            style:GoogleFonts.poppins(
+                            style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.black
-                            ),
+                                color: Colors.black),
                           ),
                         )
                       ]),
                   Container(
                     child: Visibility(
                       visible: buttonVisible,
-                      child:Column(
+                      child: Column(
                         children: [
                           TextButton(
                             onPressed: () async {
-                              final prefs = await SharedPreferences.getInstance();
-                              email = prefs.getString('email')!;
-                              password=prefs.getString('password')!;
-                              final authenticate = await LocalAuth.authenticate();
-                              setState(() {
-                                authenticated=authenticate;
-                                if(authenticated){
-                                  print(authenticated);
-                                  _login();
-                                }
-
-                              });
+                              await _authenticate();
+                              if (authenticated) {
+                                _login();
+                              }
                             },
                             child: Text(
                               'Login as $getName',
                               style: GoogleFonts.poppins(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
-                                  color: Colors.white
-                              ),
+                                  color: Colors.white),
                             ),
                           ),
                         ],
@@ -320,8 +285,7 @@ class _loginScreenState extends State<loginScreen> {
       prefs.setString('name', getVal['name']);
       prefs.setString('email', getVal['email']);
       prefs.setString('password', getVal['password']);
-      prefs.setString('id',getVal['id'].toString());
-      print("pushing to getfunction");
+      prefs.setString('id', getVal['id'].toString());
       _get();
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => NavPage())
@@ -334,18 +298,9 @@ class _loginScreenState extends State<loginScreen> {
   _get() async {
     final prefs = await SharedPreferences.getInstance();
     getName = prefs.getString('name')!;
-    getPassword=prefs.getString('password')!;
-    print("printing name below & password");
-    print(getName);
-    print(getPassword);
-    print("printing condition below");
-    if(getName.isEmpty){
-      buttonVisible=false;
-    }
-    else if(getName.isNotEmpty){
-      buttonVisible=true;
-    }
-    print(buttonVisible);
+    getPassword = prefs.getString('password')!;
+    setState(() {
+      buttonVisible = getName.isNotEmpty && getPassword.isNotEmpty;
+    });
   }
 }
-

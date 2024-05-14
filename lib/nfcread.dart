@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
 import 'package:http/http.dart' as http;
@@ -44,11 +43,9 @@ class _nfcReadState extends State<nfcRead> {
     );
 
     if (response.statusCode == 200) {
-      // If the server returns a 200 OK response, parse the JSON
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((e) => Equipment.fromJson(e)).toList();
     } else {
-      // If the server did not return a 200 OK response, throw an exception.
       throw Exception('Failed to load equipments');
     }
   }
@@ -56,7 +53,6 @@ class _nfcReadState extends State<nfcRead> {
   Color getColorBasedOnDate(String nextDate) {
     DateTime next = DateTime.parse(nextDate);
     DateTime now = DateTime.now();
-    // Difference in days
     int difference = next.difference(now).inDays;
     if (difference <= 30) {
       return Colors.red;
@@ -70,6 +66,52 @@ class _nfcReadState extends State<nfcRead> {
       MaterialPageRoute(
         builder: (context) => EquipmentDetailsPage(equipment: equipment),
       ),
+    );
+  }
+
+  void _showSearchResultsDialog(List<Equipment> equipments) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Search Results'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              itemCount: equipments.length,
+              itemBuilder: (context, index) {
+                Equipment equipment = equipments[index];
+                Color cardColor = getColorBasedOnDate(equipment.nextdate);
+                return Card(
+                  color: cardColor,
+                  child: ListTile(
+                    title: Text(equipment.eq_name),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Equipment Name: ${equipment.eq_name}"),
+                        Text("Serial Number: ${equipment.eq_serial}"),
+                        Text("Manufacturer: ${equipment.eq_manuf}"),
+                        Text("Hospital: ${equipment.eq_hospital}"),
+                        Text("Department: ${equipment.eq_department}"),
+                        Text("Ward: ${equipment.eq_ward}"),
+                        Text("PIC: ${equipment.eq_pic}"),
+                        Text("Class: ${equipment.eq_class}"),
+                        Text("Type: ${equipment.eq_type}"),
+                        Text("Last Date: ${equipment.date}"),
+                        Text("Next Date: ${equipment.nextdate}"),
+                      ],
+                    ),
+                    onTap: () {
+                      _showDetails(context, equipment);
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -99,50 +141,7 @@ class _nfcReadState extends State<nfcRead> {
                     setState(() {
                       _equipments = equipments;
                     });
-                    // Show search results dialog
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('Search Results'),
-                          content: SizedBox(
-                            width: double.maxFinite,
-                            child: ListView.builder(
-                              itemCount: equipments.length,
-                              itemBuilder: (context, index) {
-                                Equipment equipment = equipments[index];
-                                Color cardColor = getColorBasedOnDate(equipment.nextdate);
-                                return Card(
-                                  color: cardColor,
-                                  child: ListTile(
-                                    title: Text(equipment.eq_name),
-                                    subtitle: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text("Equipment Name: ${equipment.eq_name}"),
-                                        Text("Serial Number: ${equipment.eq_serial}"),
-                                        Text("Manufacturer: ${equipment.eq_manuf}"),
-                                        Text("Hospital: ${equipment.eq_hospital}"),
-                                        Text("Department: ${equipment.eq_department}"),
-                                        Text("Ward: ${equipment.eq_ward}"),
-                                        Text("PIC: ${equipment.eq_pic}"),
-                                        Text("Class: ${equipment.eq_class}"),
-                                        Text("Type: ${equipment.eq_type}"),
-                                        Text("Last Date: ${equipment.date}"),
-                                        Text("Next Date: ${equipment.nextdate}"),
-                                      ],
-                                    ),
-                                    onTap: () {
-                                      _showDetails(context, equipment);
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                    );
+                    _showSearchResultsDialog(equipments);
                   } catch (e) {
                     print('Error: $e');
                   }
@@ -155,7 +154,6 @@ class _nfcReadState extends State<nfcRead> {
             SizedBox(height: 20),
             Text(
               _barcode == null ? 'SCAN RFID' : 'RFID: $_barcode',
-
             ),
             BarcodeKeyboardListener(
               bufferDuration: Duration(milliseconds: 200),
@@ -163,57 +161,12 @@ class _nfcReadState extends State<nfcRead> {
                 setState(() {
                   _barcode = barcode;
                 });
-                // Trigger search query with barcode value
                 _searchController.text = barcode;
-                // Perform search immediately after barcode scan
                 _performSearch(barcode).then((equipments) {
                   setState(() {
                     _equipments = equipments;
                   });
-                  // Show search results dialog
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text('Search Results'),
-                        content: SizedBox(
-                          width: double.maxFinite,
-                          child: ListView.builder(
-                            itemCount: equipments.length,
-                            itemBuilder: (context, index) {
-                              Equipment equipment = equipments[index];
-                              Color cardColor = getColorBasedOnDate(equipment.nextdate);
-                              return Card(
-                                color: cardColor,
-                                child: ListTile(
-                                  title: Text(equipment.eq_name),
-                                  subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Equipment Name: ${equipment.eq_name}"),
-                                      Text("Serial Number: ${equipment.eq_serial}"),
-                                      Text("Manufacturer: ${equipment.eq_manuf}"),
-                                      Text("Hospital: ${equipment.eq_hospital}"),
-                                      Text("Department: ${equipment.eq_department}"),
-                                      Text("Ward: ${equipment.eq_ward}"),
-                                      Text("PIC: ${equipment.eq_pic}"),
-                                      Text("Class: ${equipment.eq_class}"),
-                                      Text("Type: ${equipment.eq_type}"),
-                                      Text("Last Date: ${equipment.date}"),
-                                      Text("Next Date: ${equipment.nextdate}"),
-                                    ],
-                                  ),
-                                  onTap: () {
-                                    _showDetails(context, equipment);
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      );
-                    },
-                  );
+                  _showSearchResultsDialog(equipments);
                 }).catchError((e) {
                   print('Error: $e');
                 });

@@ -3,11 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
+import 'package:flutter_barcode_listener/flutter_barcode_listener.dart'; // Import flutter_barcode_listener
 import 'package:ppm/vendor_main.dart';
 
 import 'CallApi/CallApi.dart';
-import 'TextFieldwithNoKeyboard.dart';
 
 class AddRefIDPage extends StatefulWidget {
   final String eqname;
@@ -43,7 +42,6 @@ class AddRefIDPage extends StatefulWidget {
 
 class _AddRefIDPageState extends State<AddRefIDPage> {
   String? _scannedRFID;
-  late TextEditingController _rfidTextController;
   DateTime currentDate = DateTime.now();
   String nextYearDate1 = '';
   String? _refId;
@@ -51,32 +49,29 @@ class _AddRefIDPageState extends State<AddRefIDPage> {
   @override
   void initState() {
     super.initState();
-    _rfidTextController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _rfidTextController.dispose();
     super.dispose();
   }
 
-  void _updateScannedRFID(String value) {
+  void _updateScannedRFID(String barcode) {
     setState(() {
-      _scannedRFID = value;
+      _scannedRFID = barcode;
 
-      // Check if the length of the entered RFID value is equal to the expected length
+      // Check if the length of the scanned barcode is equal to the expected length
       if (_scannedRFID != null && _scannedRFID!.length == 10) {
         _refId = _scannedRFID;
         print(_refId);
-        // Display the message once the last value is entered and completed
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('RFID scanned!'),
-            duration: Duration(seconds: 2),
-          ),
+        // Display the message once the last value is scanned and completed
+        Fluttertoast.showToast(
+          msg: 'RFID scanned!',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
         );
         _scannedRFID = null;
-        _skipRFIDScanning();
+        _withRFIDScan();
       }
     });
   }
@@ -91,13 +86,12 @@ class _AddRefIDPageState extends State<AddRefIDPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // Use custom TextField
-            TextFieldWithNoKeyboard(
-              controller: _rfidTextController,
-              cursorColor: Colors.transparent,
-              style: TextStyle(color: Colors.transparent),
-              onValueUpdated: _updateScannedRFID,
-              autofocus: true, // Make the text field active
+            // Use the BarcodeKeyboardListener widget
+            BarcodeKeyboardListener(
+              bufferDuration: Duration(milliseconds: 200),
+              onBarcodeScanned: _updateScannedRFID,
+              useKeyDownEvent: true,
+              child: Container(), // Dummy child widget
             ),
             Text(
               _scannedRFID ?? 'RFID not scanned yet',
@@ -107,15 +101,6 @@ class _AddRefIDPageState extends State<AddRefIDPage> {
               onPressed: _skipRFIDScanning,
               child: Text('Skip RFID Scanning'),
             ),
-            BarcodeKeyboardListener(
-              bufferDuration: Duration(milliseconds: 200),
-              onBarcodeScanned: (barcode) {
-                _rfidTextController.text = barcode;
-                _updateScannedRFID(barcode);
-              },
-              useKeyDownEvent: true,
-              child: Container(), // Dummy child widget
-            ),
           ],
         ),
       ),
@@ -123,18 +108,21 @@ class _AddRefIDPageState extends State<AddRefIDPage> {
   }
 
   void _skipRFIDScanning() {
-    DateTime nextYearDate = DateTime(currentDate.year + 1, currentDate.month, currentDate.day);
+    DateTime nextYearDate =
+    DateTime(currentDate.year + 1, currentDate.month, currentDate.day);
     nextYearDate1 = DateFormat('yyyy-MM-dd').format(nextYearDate);
     _submitFunction();
   }
 
-  void _submitFunction() async {
-    // Your submit function code here
-    SnackBar(
-      content: Text('Please Wait!'),
-      duration: Duration(seconds: 2),
-    );
-    String refId = _refId ?? 'Not Set'; // Use the value of _refId if it's set, otherwise use 'Not Set'
+  void _withRFIDScan() {
+    DateTime nextYearDate =
+    DateTime(currentDate.year + 1, currentDate.month, currentDate.day);
+    nextYearDate1 = DateFormat('yyyy-MM-dd').format(nextYearDate);
+    _submitwithRFIDFunction();
+  }
+
+  void _submitwithRFIDFunction() async {
+    String? refId = _refId; // Use the value of _refId if it's set, otherwise use 'Not Set'
 
     var data = {
       'eq_name': widget.eqname,
@@ -158,9 +146,46 @@ class _AddRefIDPageState extends State<AddRefIDPage> {
 
     if (getVal['success']) {
       Fluttertoast.showToast(msg: "Equipment created Successfully.");
-      Navigator.push(
+      Navigator.pushReplacementNamed(context, '/vendorMain'); // Navigate to vendorMain page and remove current page from the stack
+    } else {
+      Fluttertoast.showToast(
+        msg: getVal['message'] ?? "Equipment failed to create.",
+      );
+    }
+  }
+
+  void _submitFunction() async {
+    String refId = 'Not Set'; // Use the value of _refId if it's set, otherwise use 'Not Set'
+
+    var data = {
+      'eq_name': widget.eqname,
+      'eq_serial': widget.eqserial,
+      'eq_manuf': widget.eqmanuf,
+      'eq_hospital': widget.selectedHospitalName,
+      'eq_department': widget.eqdepart,
+      'eq_ward': widget.eqward,
+      'eq_pic': widget.selectedUserName,
+      'eq_class': widget.selectedEquipmentClass,
+      'eq_type': widget.selectedEquipmentType,
+      'email': widget.selectedUserEmail,
+      'name': widget.selectedUserName,
+      'date': widget.formattedDate,
+      'nextdate': nextYearDate1,
+      'ref_id': refId, // Use the value of refId
+    };
+
+    var res = await CallApi().addEquip(data, 'addEquip');
+    var getVal = json.decode(res.body);
+
+    if (getVal['success']) {
+      Fluttertoast.showToast(msg: "Equipment created Successfully.");
+      // Pop all other pages and push vendorMain
+      Navigator.pushAndRemoveUntil<dynamic>(
         context,
-        MaterialPageRoute(builder: (context) => vendorMain()),
+        MaterialPageRoute<dynamic>(
+          builder: (BuildContext context) => vendorMain(),
+        ),
+            (route) => false,//if you want to disable back feature set to false
       );
     } else {
       Fluttertoast.showToast(
