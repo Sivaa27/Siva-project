@@ -42,7 +42,6 @@ String _generatePassword() {
   return password;
 }
 
-
 class newUser extends StatefulWidget {
   const newUser({super.key});
 
@@ -59,6 +58,7 @@ class _newUserState extends State<newUser> {
   String passwordGenerated = 'Generate password';
   List<Hospital>? hospitals; // List to hold hospitals
   Hospital? selectedHospital; // Nullable selected hospital
+  String role = 'User'; // Default role
 
   @override
   void initState() {
@@ -111,14 +111,16 @@ class _newUserState extends State<newUser> {
                       ),
                       SizedBox(height: 30),
                       TextFormField(
-                        validator: (val){
-                          if (val==null || val.isEmpty){
+                        validator: (val) {
+                          if (val == null || val.isEmpty) {
                             return 'Please Enter Name';
                           }
-                          return val.length < 8 ? 'Minimum character length is 8' : null;
+                          return val.length < 8
+                              ? 'Minimum character length is 8'
+                              : null;
                         },
-                        onChanged: (val){
-                          name=val;
+                        onChanged: (val) {
+                          name = val;
                         },
                         style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
@@ -139,23 +141,22 @@ class _newUserState extends State<newUser> {
                           fillColor: Colors.grey.shade100,
                           labelStyle: TextStyle(color: Colors.black),
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(40)
-                          ),
+                              borderRadius: BorderRadius.circular(40)),
                         ),
                       ),
                       const SizedBox(
                         height: 30,
                       ),
                       TextFormField(
-                        validator: (val){
-                          if (val== null || val.isEmpty){
+                        validator: (val) {
+                          if (val == null || val.isEmpty) {
                             return 'Please Enter Email';
                           }
                           var rx = RegExp(r'\b@\S+\.com\b', caseSensitive: false);
                           return rx.hasMatch(val) ? null : 'Invalid Email';
                         },
-                        onChanged: (val){
-                          email=val;
+                        onChanged: (val) {
+                          email = val;
                         },
                         style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
@@ -195,18 +196,22 @@ class _newUserState extends State<newUser> {
                               obscureText: obscurePassword,
                               decoration: InputDecoration(
                                 focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(40)),
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(40)),
                                   borderSide: BorderSide.none,
                                 ),
                                 enabledBorder: UnderlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(40)),
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(40)),
                                   borderSide: BorderSide.none,
                                 ),
                                 prefixIcon: Icon(
                                   Icons.password,
                                   color: Colors.white,
                                 ),
-                                hintText: passwordGenerated.isNotEmpty ? passwordGenerated : 'Password',
+                                hintText: passwordGenerated.isNotEmpty
+                                    ? passwordGenerated
+                                    : 'Password',
                                 hintStyle: const TextStyle(color: Colors.white),
                               ),
                             ),
@@ -217,66 +222,105 @@ class _newUserState extends State<newUser> {
                                 password = _generatePassword(); // Call function to generate password
                                 print(password);
                                 obscurePassword = false; // Show password temporarily
-                                passwordGenerated='Password Generated';
+                                passwordGenerated = 'Password Generated';
                               });
                             },
                             child: Icon(Icons.refresh),
                           ),
                         ],
                       ),
-
-
                       const SizedBox(
                         height: 30,
                       ),
-
-                      // Hospital dropdown
-// Hospital dropdown
-                      hospitals == null
-                          ? Center(child: CircularProgressIndicator()) // Show a loading indicator while hospitals are being fetched
-                          : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      // Role selection
+                      Row(
                         children: [
-                          DropdownButtonFormField<Hospital>(
-                            value: selectedHospital,
-                            onChanged: (Hospital? newValue) {
-                              setState(() {
-                                selectedHospital = newValue;
-                              });
-                            },
-                            items: hospitals!.map<DropdownMenuItem<Hospital>>((Hospital value) {
-                              return DropdownMenuItem<Hospital>(
-                                value: value,
-                                child: Text(value.name),
-                              );
-                            }).toList(),
-                            decoration: InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(40)),
-                                borderSide: BorderSide.none,
+                          Expanded(
+                            child: ListTile(
+                              title: const Text(
+                                'User',
+                                style: TextStyle(color: Colors.white),
                               ),
-                              enabledBorder: UnderlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(40)),
-                                borderSide: BorderSide.none,
+                              leading: Radio<String>(
+                                value: 'User',
+                                groupValue: role,
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    role = value!;
+                                  });
+                                },
+                                activeColor: Colors.white,
+                                fillColor: MaterialStateColor.resolveWith((states) => Colors.white),
                               ),
-                              prefixIcon: Icon(
-                                Icons.card_membership,
-                                color: Colors.white,
-                              ),
-                              hintText: 'Select Hospital',
-                              hintStyle: const TextStyle(color: Colors.white),
                             ),
                           ),
-                          SizedBox(height: 10),
-                          Text(
-                            "Can't find your hospital? Add new hospital.",
-                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          Expanded(
+                            child: ListTile(
+                              title: const Text(
+                                'Vendor',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              leading: Radio<String>(
+                                value: 'Vendor',
+                                groupValue: role,
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    role = value!;
+                                  });
+                                },
+                                activeColor: Colors.white,
+                                fillColor: MaterialStateColor.resolveWith((states) => Colors.white),
+                              ),
+                            ),
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 30),
-
+                      // Conditionally show the hospital dropdown
+                      if (role == 'User')
+                        hospitals == null
+                            ? Center(child: CircularProgressIndicator())
+                            : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            DropdownButtonFormField<Hospital>(
+                              value: selectedHospital,
+                              onChanged: (Hospital? newValue) {
+                                setState(() {
+                                  selectedHospital = newValue;
+                                });
+                              },
+                              items: hospitals!.map<DropdownMenuItem<Hospital>>((Hospital value) {
+                                return DropdownMenuItem<Hospital>(
+                                  value: value,
+                                  child: Text(value.name),
+                                );
+                              }).toList(),
+                              decoration: InputDecoration(
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(40)),
+                                  borderSide: BorderSide.none,
+                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(40)),
+                                  borderSide: BorderSide.none,
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.card_membership,
+                                  color: Colors.white,
+                                ),
+                                hintText: 'Select Hospital',
+                                hintStyle: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              "Can't find your hospital? Add new hospital.",
+                              style: TextStyle(color: Colors.white, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      const SizedBox(height: 30),
                       // Register button...
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -295,7 +339,7 @@ class _newUserState extends State<newUser> {
                             child: IconButton(
                               color: Colors.white,
                               onPressed: () {
-                                if(_formKey.currentState!.validate()){
+                                if (_formKey.currentState!.validate()) {
                                   _register();
                                 }
                               },
@@ -319,26 +363,25 @@ class _newUserState extends State<newUser> {
   }
 
   // Register function...
-  _register() async{
+  _register() async {
     Fluttertoast.showToast(msg: "Please Wait");
     String token = 'test';
     var data = {
-      'name':name,
-      'email':email,
-      'hospital':selectedHospital!.name, // Use selected hospital's name
-      'password':password,
-      'token':token,
+      'name': name,
+      'email': email,
+      'hospital': role == 'Vendor' ? 'Vendor' : selectedHospital!.name, // Use selected hospital's name or 'Vendor'
+      'password': password,
+      'token': token,
     };
 
-    var res = await CallApi().RegisterData(data,'register');
+    var res = await CallApi().RegisterData(data, 'register');
     var getVal = json.decode(res.body);
 
-    if (getVal['success']){
+    if (getVal['success']) {
       Fluttertoast.showToast(msg: "Account created Successfully.");
       Navigator.push(context,
-          MaterialPageRoute(builder:(context)=>vendorMain())
-      );
-    }else{
+          MaterialPageRoute(builder: (context) => vendorMain()));
+    } else {
       Fluttertoast.showToast(msg: getVal['message'] ?? "Account failed to create.");
     }
   }

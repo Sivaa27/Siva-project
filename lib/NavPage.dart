@@ -1,11 +1,12 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icon.dart';
+import 'package:ppm/user/user_main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ppm/home.dart';
 import 'package:ppm/profile.dart';
 import 'package:ppm/vendor_main.dart';
-
-
+import 'package:ppm/user/user_main.dart'; // Import user_main page
 
 class NavPage extends StatefulWidget {
   const NavPage({Key? key}) : super(key: key);
@@ -16,17 +17,31 @@ class NavPage extends StatefulWidget {
 
 class _NavPageState extends State<NavPage> {
   Color color = Color(0xA30098FF);
+  String? hospital;
+  int index = 0;
 
   @override
   void initState() {
     super.initState();
-
+    _loadHospitalValue();
   }
 
-  int index = 0;
+  Future<void> _loadHospitalValue() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      hospital = prefs.getString('hospital');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (hospital == null) {
+      // Show a loading indicator while waiting for the hospital value to load
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       body: buildPages(),
       bottomNavigationBar: buildBar(),
@@ -34,11 +49,15 @@ class _NavPageState extends State<NavPage> {
   }
 
   Widget buildPages() {
-    switch (index) {
-      case 1:
-        return manageAccount();
-      default:
-        return vendorMain();
+    if (hospital == 'Vendor') {
+      return vendorMain();
+    } else {
+      switch (index) {
+        case 1:
+          return manageAccount();
+        default:
+          return userMain();
+      }
     }
   }
 

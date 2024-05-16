@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:ppm/vendor_main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'AddRefIdPage.dart';
 import 'CallApi/CallApi.dart';
@@ -35,41 +36,30 @@ class _addEquipState extends State<addEquip> {
   String eqname = '';
   String eqserial = '';
   String eqmanuf = '';
-  String eqhosp = '';
   String eqdepart = '';
   String eqward = '';
-  String eqpic = '';
-  String eqclass = '';
-  String eqtype = '';
-  String nextYearDate1='';
-  List<Hospital>? hospitals; // List to hold hospitals
-  Hospital? selectedHospital; // Nullable selected hospital
-  List<String> equipmentClasses = [
-    'Class 1',
-    'Class 2',
-    'Class 3'
-  ]; // Equipment classes options
-  String? selectedEquipmentClass; // Selected equipment class
-  List<userHospital> users = []; // List to hold users
-  userHospital? selectedUser; // Selected user
-  // Define the equipment types options
+  List<Hospital>? hospitals;
+  Hospital? selectedHospital;
+  List<String> equipmentClasses = ['Class 1', 'Class 2', 'Class 3'];
+  String? selectedEquipmentClass;
+  List<userHospital> users = [];
+  userHospital? selectedUser;
   List<String> equipmentTypes = ['Type B', 'Type BF', 'Type CF'];
   String? selectedEquipmentType;
   String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  DateTime currentDate = DateTime.now();
-  String? selectedUserEmail; // Nullable selected user email
-  String? selectedUserName; // Nullable selected user email
-  String? selectedHospitalName; // Nullable selected user email
-  String? selectedType; // Nullable selected type
-  String? selectedClass; // Nullable selected class
+  String? selectedUserEmail;
+  String? selectedUserName;
+  String? selectedHospitalName;
+  String getEmail = '';
 
   @override
   void initState() {
     super.initState();
     _fetchHospitals(); // Fetch hospitals when widget initializes
+    _get(); // Call _get() to initialize getEmail
   }
 
-  // Function to fetch hospitals
+
   void _fetchHospitals() async {
     List<Hospital> fetchedHospitals = await CallApi.getHospital();
     setState(() {
@@ -77,19 +67,15 @@ class _addEquipState extends State<addEquip> {
     });
   }
 
-  // Function to fetch users based on selected hospital
   void _fetchUsers(String hospital) async {
     try {
-      // Make API call to get users
       List<userHospital> fetchedUsers = await CallApi.getUserHospital(hospital);
       setState(() {
         users = fetchedUsers;
-        selectedUser = null; // Reset selected user when fetching new users
+        selectedUser = null;
       });
     } catch (e) {
-      // Handle any errors that occur during the API call
       print('Error fetching users: $e');
-      // Show an error message to the user
       Fluttertoast.showToast(
           msg: 'Error fetching users. Please try again later.');
     }
@@ -97,574 +83,238 @@ class _addEquipState extends State<addEquip> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage("assets/images/cbg.png"),
-          fit: BoxFit.cover,
-          opacity: 0.3,
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add New Equipment'),
+        backgroundColor: Colors.blue,
+        elevation: 0,
       ),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-        backgroundColor: Colors.transparent,
-        body: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Container(
-                  padding: EdgeInsets.only(
-                    right: 35,
-                    left: 35,
-                    top: MediaQuery.of(context).size.height * 0,
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(left: 35, top: 2),
-                        child: const Text(
-                          "Add new Equipment",
-                          style: TextStyle(color: Colors.white, fontSize: 33),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Equipment Description', // Explanation of the equipment name
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          TextFormField(
-                            validator: (val) {
-                              if (val == null || val.isEmpty) {
-                                return 'Please Enter Equipment Name';
-                              }
-                              return val.length < 3
-                                  ? 'Minimum character length is 3'
-                                  : null;
-                            },
-                            onChanged: (val) {
-                              eqname = val;
-                            },
-                            style: TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(40)),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: UnderlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(40)),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon: Icon(
-                                Icons.person,
-                                color: Colors.white,
-                              ),
-                              hintText: 'Equipment Name',
-                              hintStyle: const TextStyle(color: Colors.white),
-                              fillColor: Colors.grey.shade100,
-                              labelStyle: TextStyle(color: Colors.black),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(40),
-                              ),
-                            ),
-                          ), // Equipment Name
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      TextFormField(
-                        validator: (val) {
-                          if (val == null || val.isEmpty) {
-                            return 'Please Enter Equipment Serial Num';
-                          }
-                          return null;
-                        },
-                        onChanged: (val) {
-                          eqserial = val;
-                        },
-                        style: TextStyle(color: Colors.white),
-                        obscureText: false,
-                        decoration: InputDecoration(
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(40)),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: UnderlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(40)),
-                            borderSide: BorderSide.none,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.card_membership,
-                            color: Colors.white,
-                          ),
-                          hintText: 'Equipment Serial Num',
-                          hintStyle: const TextStyle(color: Colors.white),
-                        ),
-                      ), // Equipment Serial
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      TextFormField(
-                        validator: (val) {
-                          if (val == null || val.isEmpty) {
-                            return 'Please Enter Manufacturer';
-                          }
-                        },
-                        onChanged: (val) {
-                          eqmanuf = val;
-                        },
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(40)),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: UnderlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(40)),
-                            borderSide: BorderSide.none,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.email,
-                            color: Colors.white,
-                          ),
-                          hintText: 'Equipment Manufacturer',
-                          hintStyle: const TextStyle(color: Colors.white),
-                        ),
-                      ), // Equipment Manufacturer
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'PPM Date', // Explanation of the date
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          TextFormField(
-                            enabled: false, // Make it non-editable
-                            initialValue:
-                            formattedDate, // Set the initial value to today's date
-                            style: TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(40)),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: UnderlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(40)),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon: Icon(
-                                Icons.calendar_today,
-                                color: Colors.white,
-                              ),
-                              hintText: 'Today\'s Date',
-                              hintStyle: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      hospitals == null
-                          ? Center(
-                          child:
-                          CircularProgressIndicator()) // Show a loading indicator while hospitals are being fetched
-                          : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Assign Hospital and PIC', // Explanation of the hospital dropdown
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          DropdownButtonFormField<Hospital>(
-                            value: selectedHospital,
-                            onChanged: (Hospital? newValue) {
-                              setState(() {
-                                selectedHospital = newValue;
-                                // Fetch users based on selected hospital
-                                _fetchUsers(selectedHospital!.name);
-                              });
-                            },
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please select a hospital';
-                              }
-                              return null;
-                            },
-                            items: hospitals!
-                                .map<DropdownMenuItem<Hospital>>(
-                                    (Hospital value) {
-                                  return DropdownMenuItem<Hospital>(
-                                    value: value,
-                                    child: Text(
-                                      value.name,
-                                      style: TextStyle(
-                                        color: Colors
-                                            .white, // Set text color to white
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                            decoration: InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(40)),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: UnderlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(40)),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon: Icon(
-                                Icons.card_membership,
-                                color: Colors.white,
-                              ),
-                              hintText: 'Select Hospital',
-                              hintStyle:
-                              const TextStyle(color: Colors.white),
-                              fillColor: Colors.grey.shade100,
-                            ),
-                            dropdownColor: Colors.black,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Equipment Department',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              TextFormField(
-                                validator: (val) {
-                                  if (val == null || val.isEmpty) {
-                                    return 'Please Enter Equipment Department';
-                                  }
-                                  return null;
-                                },
-                                onChanged: (val) {
-                                  eqdepart = val;
-                                },
-                                style: TextStyle(color: Colors.white),
-                                decoration: InputDecoration(
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(40)),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(40)),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.business,
-                                    color: Colors.white,
-                                  ),
-                                  hintText: 'Equipment Department',
-                                  hintStyle: const TextStyle(color: Colors.white),
-                                ),
-                              ), // Equipment Department
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 30,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Equipment Ward',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              TextFormField(
-                                validator: (val) {
-                                  if (val == null || val.isEmpty) {
-                                    return 'Please Enter Equipment Ward';
-                                  }
-                                  return null;
-                                },
-                                onChanged: (val) {
-                                  eqward = val;
-                                },
-                                style: TextStyle(color: Colors.white),
-                                decoration: InputDecoration(
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(40)),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(40)),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.business_center,
-                                    color: Colors.white,
-                                  ),
-                                  hintText: 'Equipment Ward',
-                                  hintStyle: const TextStyle(color: Colors.white),
-                                ),
-                              ), // Equipment Ward
-                            ],
-                          ),
-                          const SizedBox(
-                              height: 30), // Equipment Hospital
-                          users.isEmpty
-                              ? Center(child: CircularProgressIndicator())
-                              : IgnorePointer(
-                            ignoring: users.isEmpty,
-                            child: DropdownButtonFormField<
-                                userHospital>(
-                              value:
-                              selectedUser, // Set initial value to selected user
-                              onChanged: (userHospital? newValue) {
-                                setState(() {
-                                  selectedUser =
-                                      newValue; // Update selected user
-                                  _updateSelectedUserEmail(); // Update selectedUserEmail
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please select a user';
-                                }
-                                return null;
-                              },
-                              items: users.map<
-                                  DropdownMenuItem<
-                                      userHospital>>(
-                                      (userHospital user) {
-                                    return DropdownMenuItem<
-                                        userHospital>(
-                                      value: user,
-                                      child: Text(
-                                        user.name,
-                                        style: TextStyle(
-                                          color: Colors
-                                              .white, // Set text color to white
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                              decoration: InputDecoration(
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(40)),
-                                  borderSide: BorderSide.none,
-                                ),
-                                enabledBorder: UnderlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(40)),
-                                  borderSide: BorderSide.none,
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.card_membership,
-                                  color: Colors.white,
-                                ),
-                                hintText: 'Select Person-in-Charge',
-                                hintStyle: const TextStyle(
-                                    color: Colors.white),
-                                fillColor: Colors.grey.shade100,
-                              ),
-                              dropdownColor: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 30), // User Dropdown
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Equipment Type & Class', // Explanation of the equipment type and class
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          DropdownButtonFormField<String>(
-                            value: selectedEquipmentClass,
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedEquipmentClass = newValue;
-                              });
-                            },
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please select a class';
-                              }
-                              return null;
-                            },
-                            items: equipmentClasses
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    color:
-                                    Colors.white, // Set text color to white
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                            decoration: InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(40)),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: UnderlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(40)),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon: Icon(
-                                Icons.card_membership,
-                                color: Colors.white,
-                              ),
-                              hintText: 'Select Equipment Class',
-                              fillColor: Colors.grey.shade100,
-                              hintStyle: const TextStyle(color: Colors.white),
-                            ),
-                            dropdownColor: Colors.black,
-                          ),
-                          const SizedBox(height: 30), // Equipment Class
-                          DropdownButtonFormField<String>(
-                            value: selectedEquipmentType,
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedEquipmentType = newValue;
-                              });
-                            },
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please select an equipment type';
-                              }
-                              return null;
-                            },
-                            items: equipmentTypes
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    color:
-                                    Colors.white, // Set text color to white
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                            decoration: InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(40)),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: UnderlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(40)),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon: Icon(
-                                Icons.card_membership,
-                                color: Colors.white,
-                              ),
-                              hintText: 'Select Equipment Type',
-                              hintStyle: const TextStyle(color: Colors.white),
-                              fillColor: Colors.grey.shade100,
-                            ),
-                            dropdownColor: Colors.black,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 30),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Add Equipment',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 27,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundColor: const Color(0xff4c505b),
-                            child: IconButton(
-                              color: Colors.white,
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => AddRefIDPage(
-                                          eqname: eqname,
-                                          eqserial: eqserial,
-                                          eqmanuf: eqmanuf,
-                                          eqdepart: eqdepart,
-                                          eqward: eqward,
-                                          selectedUserName: selectedUserName,
-                                          selectedHospitalName: selectedHospitalName,
-                                          selectedEquipmentClass: selectedEquipmentClass,
-                                          selectedEquipmentType: selectedEquipmentType,
-                                          selectedUserEmail: selectedUserEmail,
-                                          formattedDate: formattedDate,
-                                        )),
-                                  );
-                                }
-                              },
-                              icon: const Icon(Icons.arrow_forward),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 40,
-                      ),
-                    ],
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Equipment Description',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
+                SizedBox(height: 10),
+                TextFormField(
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return 'Please Enter Equipment Name';
+                    }
+                    return val.length < 3
+                        ? 'Minimum character length is 3'
+                        : null;
+                  },
+                  onChanged: (val) {
+                    eqname = val;
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Equipment Name',
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return 'Please Enter Equipment Serial Num';
+                    }
+                    return null;
+                  },
+                  onChanged: (val) {
+                    eqserial = val;
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Equipment Serial Num',
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return 'Please Enter Manufacturer';
+                    }
+                    return null;
+                  },
+                  onChanged: (val) {
+                    eqmanuf = val;
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Equipment Manufacturer',
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'PPM Date',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 10),
+                TextFormField(
+                  enabled: false,
+                  initialValue: formattedDate,
+                  decoration: InputDecoration(
+                    labelText: 'Today\'s Date',
+                  ),
+                ),
+                SizedBox(height: 20),
+                DropdownButtonFormField<Hospital>(
+                  value: selectedHospital,
+                  onChanged: (Hospital? newValue) {
+                    setState(() {
+                      selectedHospital = newValue;
+                      _fetchUsers(selectedHospital!.name);
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Please select a hospital';
+                    }
+                    return null;
+                  },
+                  items: hospitals != null // Add a null check here
+                      ? hospitals!
+                      .map<DropdownMenuItem<Hospital>>((Hospital value) {
+                    return DropdownMenuItem<Hospital>(
+                      value: value,
+                      child: Text(
+                        value.name,
+                      ),
+                    );
+                  })
+                      .toList()
+                      : [], // Return an empty list if hospitals is null
+                  decoration: InputDecoration(
+                    labelText: 'Select Hospital',
+                  ),
+                ),
+
+                SizedBox(height: 20),
+                DropdownButtonFormField<userHospital>(
+                  value: selectedUser,
+                  onChanged: (userHospital? newValue) {
+                    setState(() {
+                      selectedUser = newValue;
+                      _updateSelectedUserEmail();
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Please select a user';
+                    }
+                    return null;
+                  },
+                  items: users
+                      .map<DropdownMenuItem<userHospital>>((userHospital user) {
+                    return DropdownMenuItem<userHospital>(
+                      value: user,
+                      child: Text(
+                        user.name,
+                      ),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Select Person-in-Charge',
+                  ),
+                ),
+                SizedBox(height: 20),
+                DropdownButtonFormField<String>(
+                  value: selectedEquipmentClass,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedEquipmentClass = newValue;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Please select a class';
+                    }
+                    return null;
+                  },
+                  items: equipmentClasses
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Select Equipment Class',
+                  ),
+                ),
+                SizedBox(height: 20),
+                DropdownButtonFormField<String>(
+                  value: selectedEquipmentType,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedEquipmentType = newValue;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Please select an equipment type';
+                    }
+                    return null;
+                  },
+                  items: equipmentTypes
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Select Equipment Type',
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddRefIDPage(
+                                eqname: eqname,
+                                eqserial: eqserial,
+                                eqmanuf: eqmanuf,
+                                eqdepart: eqdepart,
+                                eqward: eqward,
+                                selectedUserName: selectedUserName,
+                                selectedHospitalName: selectedHospitalName,
+                                selectedEquipmentClass: selectedEquipmentClass,
+                                selectedEquipmentType: selectedEquipmentType,
+                                selectedUserEmail: selectedUserEmail,
+                                formattedDate: formattedDate,
+                                vendor: getEmail,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Text('Next'),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -678,5 +328,16 @@ class _addEquipState extends State<addEquip> {
     });
   }
 
+  _get() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Check if the key 'email' exists
+    if (prefs.containsKey('email')) {
+      getEmail = prefs.getString('email') ?? ''; // Use a default value if email is null
+      print(getEmail);
+    } else {
+      // Handle the case where the email key does not exist
+      print('Email key does not exist in SharedPreferences');
+    }
+  }
 
 }

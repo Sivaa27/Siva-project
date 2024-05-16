@@ -15,7 +15,8 @@ import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 class EquipmentDetailsPage extends StatefulWidget {
   final Equipment equipment;
 
-  const EquipmentDetailsPage({Key? key, required this.equipment}) : super(key: key);
+  const EquipmentDetailsPage({Key? key, required this.equipment})
+      : super(key: key);
 
   @override
   _EquipmentDetailsPageState createState() => _EquipmentDetailsPageState();
@@ -39,16 +40,21 @@ class _EquipmentDetailsPageState extends State<EquipmentDetailsPage> {
     super.initState();
     _nameController = TextEditingController(text: widget.equipment.eq_name);
     _serialController = TextEditingController(text: widget.equipment.eq_serial);
-    _manufacturerController = TextEditingController(text: widget.equipment.eq_manuf);
-    _hospitalController = TextEditingController(text: widget.equipment.eq_hospital);
-    _departmentController = TextEditingController(text: widget.equipment.eq_department);
+    _manufacturerController =
+        TextEditingController(text: widget.equipment.eq_manuf);
+    _hospitalController =
+        TextEditingController(text: widget.equipment.eq_hospital);
+    _departmentController =
+        TextEditingController(text: widget.equipment.eq_department);
     _wardController = TextEditingController(text: widget.equipment.eq_ward);
     _picController = TextEditingController(text: widget.equipment.eq_pic);
     _classController = TextEditingController(text: widget.equipment.eq_class);
     _typeController = TextEditingController(text: widget.equipment.eq_type);
     _dateController = TextEditingController(text: widget.equipment.date);
-    _nextDateController = TextEditingController(text: widget.equipment.nextdate);
+    _nextDateController =
+        TextEditingController(text: widget.equipment.nextdate);
     _selectedDate = DateFormat('yyyy-MM-dd').parse(widget.equipment.nextdate);
+
   }
 
   @override
@@ -72,151 +78,162 @@ class _EquipmentDetailsPageState extends State<EquipmentDetailsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Equipment Details'),
+        backgroundColor: Colors.blue,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/ppmbg.jpeg'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextFormField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: 'Equipment Name',
-                    labelStyle: GoogleFonts.roboto(),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(20),
+          color: Colors.grey[200],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Equipment Name',
+                  labelStyle: GoogleFonts.roboto(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _serialController,
+                decoration: InputDecoration(
+                  labelText: 'Serial Number',
+                  labelStyle: GoogleFonts.roboto(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _manufacturerController,
+                decoration: InputDecoration(
+                  labelText: 'Manufacturer',
+                  labelStyle: GoogleFonts.roboto(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _hospitalController,
+                decoration: InputDecoration(
+                  labelText: 'Hospital',
+                  labelStyle: GoogleFonts.roboto(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _departmentController,
+                decoration: InputDecoration(
+                  labelText: 'Department',
+                  labelStyle: GoogleFonts.roboto(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _wardController,
+                decoration: InputDecoration(
+                  labelText: 'Ward',
+                  labelStyle: GoogleFonts.roboto(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _picController,
+                decoration: InputDecoration(
+                  labelText: 'PIC',
+                  labelStyle: GoogleFonts.roboto(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _classController,
+                decoration: InputDecoration(
+                  labelText: 'Class',
+                  labelStyle: GoogleFonts.roboto(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _typeController,
+                decoration: InputDecoration(
+                  labelText: 'Type',
+                  labelStyle: GoogleFonts.roboto(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _dateController,
+                decoration: InputDecoration(
+                  labelText: 'Last Date',
+                  labelStyle: GoogleFonts.roboto(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _nextDateController,
+                onTap: () =>
+                    _selectDate(context), // Open date picker when tapped
+                readOnly: true, // Make the text field read-only
+                decoration: InputDecoration(
+                  labelText: 'Next Date',
+                  labelStyle: GoogleFonts.roboto(),
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      _update();
+                      Navigator.pop(context);
+                    },
+                    child: Text('Save'),
                   ),
-                ),
-                TextFormField(
-                  controller: _serialController,
-                  decoration: InputDecoration(
-                    labelText: 'Serial Number',
-                    labelStyle: GoogleFonts.roboto(),
-                  ),
-                ),
-                TextFormField(
-                  controller: _manufacturerController,
-                  decoration: InputDecoration(
-                    labelText: 'Manufacturer',
-                    labelStyle: GoogleFonts.roboto(),
-                  ),
-                ),
-                TextFormField(
-                  controller: _hospitalController,
-                  decoration: InputDecoration(
-                    labelText: 'Hospital',
-                    labelStyle: GoogleFonts.roboto(),
-                  ),
-                ),
-                TextFormField(
-                  controller: _departmentController,
-                  decoration: InputDecoration(
-                    labelText: 'Department',
-                    labelStyle: GoogleFonts.roboto(),
-                  ),
-                ),
-                TextFormField(
-                  controller: _wardController,
-                  decoration: InputDecoration(
-                    labelText: 'Ward',
-                    labelStyle: GoogleFonts.roboto(),
-                  ),
-                ),
-                TextFormField(
-                  controller: _picController,
-                  decoration: InputDecoration(
-                    labelText: 'PIC',
-                    labelStyle: GoogleFonts.roboto(),
-                  ),
-                ),
-                TextFormField(
-                  controller: _classController,
-                  decoration: InputDecoration(
-                    labelText: 'Class',
-                    labelStyle: GoogleFonts.roboto(),
-                  ),
-                ),
-                TextFormField(
-                  controller: _typeController,
-                  decoration: InputDecoration(
-                    labelText: 'Type',
-                    labelStyle: GoogleFonts.roboto(),
-                  ),
-                ),
-                TextFormField(
-                  controller: _dateController,
-                  decoration: InputDecoration(
-                    labelText: 'Last Date',
-                    labelStyle: GoogleFonts.roboto(),
-                  ),
-                ),
-                TextFormField(
-                  controller: _nextDateController,
-                  onTap: () => _selectDate(context), // Open date picker when tapped
-                  readOnly: true, // Make the text field read-only
-                  decoration: InputDecoration(
-                    labelText: 'Next Date',
-                    labelStyle: GoogleFonts.roboto(),
-                  ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    _update();
-                    Navigator.pop(context);
-                  },
-                  child: Text('Save'),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    // Navigate to the QuestionnairePage
-                    final selectedValues = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => QuestionnairePage()),
-                    );
+                  ElevatedButton(
+                    onPressed: () async {
+                      // Navigate to the QuestionnairePage
+                      final selectedValues = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => QuestionnairePage()),
+                      );
 
-                    // Generate PDF with selected values from the questionnaire
-                    await EquipmentDetailsPDF.generatePDF(
-                      fileName: 'equipment_details.pdf',
-                      nameController: _nameController,
-                      serialController: _serialController,
-                      manufacturerController: _manufacturerController,
-                      hospitalController: _hospitalController,
-                      departmentController: _departmentController,
-                      wardController: _wardController,
-                      picController: _picController,
-                      classController: _classController,
-                      typeController: _typeController,
-                      dateController: _dateController,
-                      nextDateController: _nextDateController,
-                      questionnaireValues: selectedValues, // Pass selected values to the PDF generation method
-                      context: context,
-                    );
+                      // Generate PDF with selected values from the questionnaire
+                      await EquipmentDetailsPDF.generatePDF(
+                        fileName: 'equipment_details.pdf',
+                        nameController: _nameController,
+                        serialController: _serialController,
+                        manufacturerController: _manufacturerController,
+                        hospitalController: _hospitalController,
+                        departmentController: _departmentController,
+                        wardController: _wardController,
+                        picController: _picController,
+                        classController: _classController,
+                        typeController: _typeController,
+                        dateController: _dateController,
+                        nextDateController: _nextDateController,
+                        questionnaireValues:
+                            selectedValues, // Pass selected values to the PDF generation method
+                        context: context,
+                      );
 
-                    // Show a message to the user
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('PDF generated successfully.'),
-                      ),
-                    );
-                  },
-                  child: Text('Generate PDF'),
-                ),
-
-
-              ],
-            ),
+                      // Show a message to the user
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('PDF generated successfully.'),
+                        ),
+                      );
+                    },
+                    child: Text('Generate PDF'),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
     );
   }
+
   // Method to open date picker
 // Method to open date picker
   Future<void> _selectDate(BuildContext context) async {
@@ -235,7 +252,8 @@ class _EquipmentDetailsPageState extends State<EquipmentDetailsPage> {
                     initialSelectedDate: _selectedDate,
                     minDate: DateTime.now(),
                     maxDate: DateTime(2101),
-                    onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+                    onSelectionChanged:
+                        (DateRangePickerSelectionChangedArgs args) {
                       if (args.value is DateTime) {
                         Navigator.pop(context, args.value);
                       }
@@ -252,14 +270,12 @@ class _EquipmentDetailsPageState extends State<EquipmentDetailsPage> {
       if (pickedDate != null && pickedDate != _selectedDate) {
         setState(() {
           _selectedDate = pickedDate;
-          _nextDateController.text = DateFormat('yyyy-MM-dd').format(_selectedDate);
+          _nextDateController.text =
+              DateFormat('yyyy-MM-dd').format(_selectedDate);
         });
       }
     });
   }
-
-
-
 
   _update() async {
     var data = {
@@ -274,21 +290,22 @@ class _EquipmentDetailsPageState extends State<EquipmentDetailsPage> {
       'eq_type': _typeController.text,
       'date': _dateController.text,
       'nextdate': _nextDateController.text,
+      'eq_pic':widget.equipment.eq_pic,
+      'vendor':widget.equipment.vendor,
+      'ref_id':widget.equipment.ref_id,
+      'pic_email':widget.equipment.pic_email,
     };
 
     var id = widget.equipment.id;
-    var res = await CallApi().updateEquipment(data, 'updateEquip',id);
+    var res = await CallApi().updateEquipment(data, 'updateEquip', id);
     var getVal = json.decode(res.body);
 
     if (getVal['success']) {
       Fluttertoast.showToast(msg: "Equipment Updated Successfully.");
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => NavPage())
-      );
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => NavPage()));
     } else {
       Fluttertoast.showToast(msg: "Invalid Credentials.");
     }
-
   }
-
 }

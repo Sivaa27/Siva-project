@@ -20,6 +20,7 @@ class AddRefIDPage extends StatefulWidget {
   final String? selectedEquipmentType;
   final String? selectedUserEmail;
   final String formattedDate;
+  final String vendor;
 
   const AddRefIDPage({
     Key? key,
@@ -34,6 +35,7 @@ class AddRefIDPage extends StatefulWidget {
     this.selectedEquipmentType,
     this.selectedUserEmail,
     required this.formattedDate,
+    required this.vendor,
   }) : super(key: key);
 
   @override
@@ -132,6 +134,7 @@ class _AddRefIDPageState extends State<AddRefIDPage> {
       'eq_department': widget.eqdepart,
       'eq_ward': widget.eqward,
       'eq_pic': widget.selectedUserName,
+      'pic_email':widget.selectedUserEmail,
       'eq_class': widget.selectedEquipmentClass,
       'eq_type': widget.selectedEquipmentType,
       'email': widget.selectedUserEmail,
@@ -139,6 +142,7 @@ class _AddRefIDPageState extends State<AddRefIDPage> {
       'date': widget.formattedDate,
       'nextdate': nextYearDate1,
       'ref_id': refId, // Use the value of refId
+      'vendor':widget.vendor,
     };
 
     var res = await CallApi().addEquip(data, 'addEquip');
@@ -165,6 +169,7 @@ class _AddRefIDPageState extends State<AddRefIDPage> {
       'eq_department': widget.eqdepart,
       'eq_ward': widget.eqward,
       'eq_pic': widget.selectedUserName,
+      'pic_email':widget.selectedUserEmail,
       'eq_class': widget.selectedEquipmentClass,
       'eq_type': widget.selectedEquipmentType,
       'email': widget.selectedUserEmail,
@@ -172,6 +177,7 @@ class _AddRefIDPageState extends State<AddRefIDPage> {
       'date': widget.formattedDate,
       'nextdate': nextYearDate1,
       'ref_id': refId, // Use the value of refId
+      'vendor':widget.vendor,
     };
 
     var res = await CallApi().addEquip(data, 'addEquip');

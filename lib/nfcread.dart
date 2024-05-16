@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -89,16 +90,8 @@ class _nfcReadState extends State<nfcRead> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Equipment Name: ${equipment.eq_name}"),
                         Text("Serial Number: ${equipment.eq_serial}"),
-                        Text("Manufacturer: ${equipment.eq_manuf}"),
                         Text("Hospital: ${equipment.eq_hospital}"),
-                        Text("Department: ${equipment.eq_department}"),
-                        Text("Ward: ${equipment.eq_ward}"),
-                        Text("PIC: ${equipment.eq_pic}"),
-                        Text("Class: ${equipment.eq_class}"),
-                        Text("Type: ${equipment.eq_type}"),
-                        Text("Last Date: ${equipment.date}"),
                         Text("Next Date: ${equipment.nextdate}"),
                       ],
                     ),
@@ -124,37 +117,25 @@ class _nfcReadState extends State<nfcRead> {
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min, // Content shrinks to minimum
+          crossAxisAlignment: CrossAxisAlignment.center,
+
           children: [
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: 'Enter keyword',
+            SizedBox(height: 200),
+            Text(
+              _barcode == null ? 'SCAN RFID' : 'RFID Scanned!',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                String keyword = _searchController.text.trim();
-                if (keyword.isNotEmpty) {
-                  try {
-                    List<Equipment> equipments = await _performSearch(keyword);
-                    setState(() {
-                      _equipments = equipments;
-                    });
-                    _showSearchResultsDialog(equipments);
-                  } catch (e) {
-                    print('Error: $e');
-                  }
-                } else {
-                  // Show a message to the user that the search field cannot be empty
-                }
-              },
-              child: Text('Search'),
-            ),
-            SizedBox(height: 20),
-            Text(
-              _barcode == null ? 'SCAN RFID' : 'RFID: $_barcode',
-            ),
+            _barcode == null
+                ? // Show loading animation only if _barcode is null
+            SpinKitRipple(
+              color: Theme.of(context).primaryColor,
+              size: 80.0,
+            )
+                : SizedBox(), // Empty container if barcode is scanned
             BarcodeKeyboardListener(
               bufferDuration: Duration(milliseconds: 200),
               onBarcodeScanned: (barcode) {
@@ -180,3 +161,4 @@ class _nfcReadState extends State<nfcRead> {
     );
   }
 }
+

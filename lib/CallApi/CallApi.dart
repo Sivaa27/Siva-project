@@ -91,10 +91,7 @@ class CallApi{
 
 
   VerifyEmail(data,apiURL) async{
-    String getEmail='';
-    final pref=await SharedPreferences.getInstance();
-    getEmail=pref.getString('tempEmail')!;
-    String fullUrl = 'http://10.0.2.2:8000/api/verify?email='+getEmail;
+    String fullUrl = 'http://10.0.2.2:8000/api/verify';
     print(convert.jsonEncode(data));
     return await http.post(
         Uri.parse(fullUrl),
@@ -221,6 +218,19 @@ class CallApi{
 
 
     String fullUrl = 'http://10.0.2.2:8000/api/updateEquip/$id';
+    print(fullUrl);
+    print(convert.jsonEncode(data));
+    return await http.post(
+        Uri.parse(fullUrl),
+        body: convert.jsonEncode(data),
+        headers: _setHeaders()
+    );
+
+  }
+
+  sendReport(data,apiURL) async{
+
+    String fullUrl = 'http://10.0.2.2:8000/api/sendreport';
     print(fullUrl);
     print(convert.jsonEncode(data));
     return await http.post(

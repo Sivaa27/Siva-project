@@ -7,10 +7,13 @@ class Equipment {
   final String eq_department;
   final String eq_ward;
   final String eq_pic;
+  final String pic_email;
   final String eq_class;
   final String eq_type;
   final String date;
   final String nextdate;
+  final String vendor;
+  final String ref_id;
 
   Equipment({
     required this.id,
@@ -21,10 +24,13 @@ class Equipment {
     required this.eq_department,
     required this.eq_ward,
     required this.eq_pic,
+    required this.pic_email,
     required this.eq_class,
     required this.eq_type,
     required this.date,
     required this.nextdate,
+    required this.vendor,
+    required this.ref_id,
   });
 
   static Equipment fromJson(Map<String, dynamic> json) => Equipment(
@@ -36,10 +42,13 @@ class Equipment {
     eq_department: json['eq_department'],
     eq_ward: json['eq_ward'],
     eq_pic: json['eq_pic'],
+    pic_email: json['pic_email'],
     eq_class: json['eq_class'],
     eq_type: json['eq_type'],
     date: json['date'],
     nextdate: json['nextdate'],
+    vendor:json['vendor'],
+    ref_id:json['ref_id'],
   );
 
   Map<String, dynamic> toJson() => {
@@ -51,9 +60,12 @@ class Equipment {
     "eq_department": eq_department,
     "eq_ward": eq_ward,
     "eq_pic": eq_pic,
+    "pic_email":pic_email,
     "eq_class": eq_class,
     "eq_type": eq_type,
     "date": date,
     "nextdate": nextdate,
+    "vendor":vendor,
+    "ref_id":ref_id,
   };
 }

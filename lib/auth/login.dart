@@ -24,6 +24,7 @@ class _loginScreenState extends State<loginScreen> {
   String password = '';
   String getName = '';
   String getPassword = '';
+  String getEmail='';
   Color enabled = const Color.fromARGB(255, 63, 56, 89);
   Color enabledtxt = Colors.white;
   Color deaible = Colors.grey;
@@ -244,7 +245,7 @@ class _loginScreenState extends State<loginScreen> {
                             onPressed: () async {
                               await _authenticate();
                               if (authenticated) {
-                                _login();
+                                _loginwithPrint();
                               }
                             },
                             child: Text(
@@ -275,7 +276,7 @@ class _loginScreenState extends State<loginScreen> {
       'password': password,
     };
 
-    var res = await CallApi().LoginData(data, 'register');
+    var res = await CallApi().LoginData(data, 'login');
     var getVal = json.decode(res.body);
 
     if (getVal['success']) {
@@ -287,8 +288,36 @@ class _loginScreenState extends State<loginScreen> {
       prefs.setString('password', getVal['password']);
       prefs.setString('id', getVal['id'].toString());
       _get();
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => NavPage())
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => NavPage()),
+      );
+    } else {
+      Fluttertoast.showToast(msg: "Invalid Credentials.");
+    }
+  }
+
+  _loginwithPrint() async {
+    var data = {
+      'email': getEmail,
+      'password': getPassword,
+    };
+
+    var res = await CallApi().LoginData(data, 'login');
+    var getVal = json.decode(res.body);
+
+    if (getVal['success']) {
+      Fluttertoast.showToast(msg: "Account Login Successfully.");
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('hospital', getVal['hospital']);
+      prefs.setString('name', getVal['name']);
+      prefs.setString('email', getVal['email']);
+      prefs.setString('password', getVal['password']);
+      prefs.setString('id', getVal['id'].toString());
+      _get();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => NavPage()),
       );
     } else {
       Fluttertoast.showToast(msg: "Invalid Credentials.");
@@ -299,6 +328,7 @@ class _loginScreenState extends State<loginScreen> {
     final prefs = await SharedPreferences.getInstance();
     getName = prefs.getString('name')!;
     getPassword = prefs.getString('password')!;
+    getEmail = prefs.getString('email')!;
     setState(() {
       buttonVisible = getName.isNotEmpty && getPassword.isNotEmpty;
     });

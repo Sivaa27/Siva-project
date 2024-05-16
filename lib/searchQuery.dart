@@ -76,11 +76,13 @@ class _searchQueryState extends State<searchQuery> {
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
                 labelText: 'Enter keyword',
+                border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 20),
@@ -100,26 +102,39 @@ class _searchQueryState extends State<searchQuery> {
                             child: ListView.builder(
                               itemCount: equipments.length,
                               itemBuilder: (context, index) {
-                                Equipment equipment = Equipment.fromJson(equipments[index]);
-                                Color cardColor = getColorBasedOnDate(equipment.nextdate);
+                                Equipment equipment =
+                                Equipment.fromJson(equipments[index]);
+                                Color cardColor =
+                                getColorBasedOnDate(equipment.nextdate);
                                 return Card(
                                   color: cardColor,
                                   child: ListTile(
-                                    title: Text(equipment.eq_name),
+                                    title: Text(
+                                      equipment.eq_name,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                     subtitle: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
                                       children: [
-                                        Text("Equipment Name: ${equipment.eq_name}"),
-                                        Text("Serial Number: ${equipment.eq_serial}"),
-                                        Text("Manufacturer: ${equipment.eq_manuf}"),
-                                        Text("Hospital: ${equipment.eq_hospital}"),
-                                        Text("Department: ${equipment.eq_department}"),
-                                        Text("Ward: ${equipment.eq_ward}"),
-                                        Text("PIC: ${equipment.eq_pic}"),
-                                        Text("Class: ${equipment.eq_class}"),
-                                        Text("Type: ${equipment.eq_type}"),
-                                        Text("Last Date: ${equipment.date}"),
-                                        Text("Next Date: ${equipment.nextdate}"),
+                                        Text('Serial Number: ${equipment.eq_serial}'),
+                                        Text('Manufacturer: ${equipment.eq_manuf}'),
+                                        Text('Hospital: ${equipment.eq_hospital}'),
+                                        Text('Department: ${equipment.eq_department}'),
+                                        Text('Ward: ${equipment.eq_ward}'),
+                                        Text('PIC: ${equipment.eq_pic}'),
+                                        Text('Class: ${equipment.eq_class}'),
+                                        Text('Type: ${equipment.eq_type}'),
+                                        Text('Last Date: ${equipment.date}'),
+                                        Text(
+                                          'Next Date: ${equipment.nextdate}',
+                                          style: TextStyle(
+                                            color: Colors.blue,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                     onTap: () {
@@ -137,7 +152,11 @@ class _searchQueryState extends State<searchQuery> {
                     print('Error: $e');
                   }
                 } else {
-                  // Show a message to the user that the search field cannot be empty
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Please enter a keyword'),
+                    ),
+                  );
                 }
               },
               child: Text('Search'),

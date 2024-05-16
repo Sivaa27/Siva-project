@@ -154,7 +154,7 @@ class _forgetPasswordState extends State<forgetPassword> {
     var data = {
       'email':emailadd,
     };
-
+    print(emailadd);
     var res = await CallApi().VerifyEmail(data,'verify');
     var getVal = json.decode(res.body);
 

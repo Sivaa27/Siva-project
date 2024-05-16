@@ -30,13 +30,14 @@ class _passwordUpdateState extends State<passwordUpdate> {
   }
   bool authenticated=false;
   String name='';
-  String matricnum='';
   String email='';
   String password='';
   String cpassword='';
   String getPassword='';
   String getName='';
   String getMatrix='';
+  String getHospital='';
+
   @override
 
   void initState()  {
@@ -234,8 +235,8 @@ class _passwordUpdateState extends State<passwordUpdate> {
     var data = {
       'name': getName,
       'email': email,
-      'matricNo':getMatrix,
       'password':password,
+      'hospital':getHospital,
     };
 
     if(cpassword==password){
@@ -277,11 +278,12 @@ class _passwordUpdateState extends State<passwordUpdate> {
     getName = prefs.getString('name')!;
     getPassword=prefs.getString('password')!;
     email=prefs.getString('email')!;
-    getMatrix=prefs.getString('studentMatrix')!;
+    getHospital=prefs.getString('hospital')!;
     print("printing name below & password");
     print(getName);
     print(getPassword);
-    print(getMatrix);
+    print(getHospital);
+    print(email);
     print("printing condition below");
 
   }
