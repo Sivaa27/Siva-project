@@ -7,6 +7,9 @@ class QuestionnairePage extends StatefulWidget {
 
 class _QuestionnairePageState extends State<QuestionnairePage> {
   Map<String, String?> questionnaireValues = {};
+  Map<String, String> remarks = {};
+  TextEditingController commentsController = TextEditingController();
+  TextEditingController performedByController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -14,45 +17,94 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
       appBar: AppBar(
         title: Text('Questionnaire'),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: ListView(
+        padding: EdgeInsets.all(16),
         children: [
-          ListTile(
-            title: Text('1. General Procedure'),
-            subtitle: Row(
-              children: [
-                Radio<String>(
-                  value: 'Pass',
-                  groupValue: questionnaireValues['General Procedure'],
-                  onChanged: (value) {
-                    setState(() {
-                      questionnaireValues['General Procedure'] = value;
-                    });
-                  },
-                ),
-                Text('Pass'),
-                Radio<String>(
-                  value: 'Fail',
-                  groupValue: questionnaireValues['General Procedure'],
-                  onChanged: (value) {
-                    setState(() {
-                      questionnaireValues['General Procedure'] = value;
-                    });
-                  },
-                ),
-                Text('Fail'),
-              ],
+          _buildQuestionTile(
+            '1. General Appearance, Product Identification, Pump Housing & AC Power Cord',
+          ),
+          _buildQuestionTile(
+            '2. Identification, Product Code & Serial Number in the System must be same with the label on the pump',
+          ),
+          _buildQuestionTile('3. EST'),
+          SizedBox(height: 20),
+          TextField(
+            controller: commentsController,
+            decoration: InputDecoration(
+              labelText: 'Comments',
+              border: OutlineInputBorder(),
             ),
           ),
-          // Add more questions here with similar structure
+          SizedBox(height: 20),
+          TextField(
+            controller: performedByController,
+            decoration: InputDecoration(
+              labelText: 'Performed By',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context, {
+                'questionnaireValues': questionnaireValues,
+                'remarks': remarks,
+                'comments': commentsController.text,
+                'performedBy': performedByController.text,
+              });
+            },
+            child: Text('Submit'),
+          ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pop(context, questionnaireValues);
-        },
-        child: Icon(Icons.check),
-      ),
+    );
+  }
+
+  Widget _buildQuestionTile(String question) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          title: Text(question),
+          subtitle: Row(
+            children: [
+              Radio<String>(
+                value: 'Pass',
+                groupValue: questionnaireValues[question],
+                onChanged: (value) {
+                  setState(() {
+                    questionnaireValues[question] = value;
+                  });
+                },
+              ),
+              Text('Pass'),
+              Radio<String>(
+                value: 'Fail',
+                groupValue: questionnaireValues[question],
+                onChanged: (value) {
+                  setState(() {
+                    questionnaireValues[question] = value;
+                  });
+                },
+              ),
+              Text('Fail'),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: TextField(
+            decoration: InputDecoration(
+              labelText: 'Remark',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: (value) {
+              remarks[question] = value;
+            },
+          ),
+        ),
+        SizedBox(height: 20),
+      ],
     );
   }
 }

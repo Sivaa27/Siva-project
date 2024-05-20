@@ -19,31 +19,24 @@ class EquipmentDetailsPDF {
     required TextEditingController typeController,
     required TextEditingController dateController,
     required TextEditingController nextDateController,
-    required Map<String, String?> questionnaireValues, // Added parameter for questionnaire values
+    required Map<String, String?> questionnaireValues,
+    required Map<String, String?> remarks,
+    required String comments,
+    required String performedBy,
     required BuildContext context,
   }) async {
-    // Create a new PDF document
     final PdfDocument document = PdfDocument();
 
-    // Add a new page to the document
+    // First page with equipment details
     final PdfPage page = document.pages.add();
-
-    // Create a PDF grid class to add tables for equipment details and checklist
     final PdfGrid grid = PdfGrid();
-    final PdfGrid checklistGrid = PdfGrid();
-
-    // Specify the grid column count for equipment details
     grid.columns.add(count: 2);
 
-    // Add a grid header row for equipment details
     final PdfGridRow headerRow = grid.headers.add(1)[0];
     headerRow.cells[0].value = 'Field';
     headerRow.cells[1].value = 'Value';
-
-    // Set header font for equipment details
     headerRow.style.font = PdfStandardFont(PdfFontFamily.helvetica, 10, style: PdfFontStyle.bold);
 
-    // Add rows to the grid for equipment details
     _addRow(grid, 'Equipment Name', nameController.text);
     _addRow(grid, 'Serial Number', serialController.text);
     _addRow(grid, 'Manufacturer', manufacturerController.text);
@@ -52,19 +45,14 @@ class EquipmentDetailsPDF {
     _addRow(grid, 'Last Date', dateController.text);
     _addRow(grid, 'Next Date', nextDateController.text);
 
-    // Set grid format for equipment details
     grid.style.cellPadding = PdfPaddings(left: 5, top: 5);
-
-    // Draw equipment details table in the PDF page
     grid.draw(
       page: page,
       bounds: Rect.fromLTWH(0, 0, page.getClientSize().width, page.getClientSize().height),
     );
 
-    // Add a new page for the checklist
+    // Second page with checklist
     document.pages.add();
-
-    // Add a title for the checklist
     final PdfPage secondPage = document.pages[1];
     final PdfTextElement title = PdfTextElement(
         text: '${nameController.text} Checklist',
@@ -74,36 +62,35 @@ class EquipmentDetailsPDF {
         bounds: Rect.fromLTWH(0, 0, secondPage.getClientSize().width, 50),
         format: PdfLayoutFormat());
 
-    // Specify the grid column count for the checklist
-    checklistGrid.columns.add(count: 2);
+    final PdfGrid checklistGrid = PdfGrid();
+    checklistGrid.columns.add(count: 3);
 
-    // Add rows to the grid for the checklist
+    final PdfGridRow checklistHeaderRow = checklistGrid.headers.add(1)[0];
+    checklistHeaderRow.cells[0].value = 'Question';
+    checklistHeaderRow.cells[1].value = 'Answer';
+    checklistHeaderRow.cells[2].value = 'Remark';
+    checklistHeaderRow.style.font = PdfStandardFont(PdfFontFamily.helvetica, 10, style: PdfFontStyle.bold);
+
     for (final entry in questionnaireValues.entries) {
-      _addRow(checklistGrid, entry.key, entry.value ?? '');
+      _addChecklistRow(checklistGrid, entry.key, entry.value ?? '', remarks[entry.key] ?? '');
     }
 
-    // Set grid format for the checklist
-    checklistGrid.style.cellPadding = PdfPaddings(left: 5, top: 5);
+    // Add Comments and Performed By
+    _addChecklistRow(checklistGrid, 'Comments', comments, '');
+    _addChecklistRow(checklistGrid, 'Performed By', performedBy, '');
 
-    // Draw checklist table in the PDF page
+    checklistGrid.style.cellPadding = PdfPaddings(left: 5, top: 5);
     checklistGrid.draw(
       page: secondPage,
       bounds: Rect.fromLTWH(0, 50, secondPage.getClientSize().width, secondPage.getClientSize().height - 50),
     );
 
-    // Get the documents directory
+    // Save and open PDF
     final directory = await getApplicationDocumentsDirectory();
-    // Construct the file path
     final filePath = '${directory.path}/$fileName';
-
-    // Save the document
     File(filePath).writeAsBytes(await document.save());
-
-    // Dispose the document
     document.dispose();
 
-    // Open the PDF file using any PDF viewer installed on the device
-    // Here, I'm using the default PDF viewer provided by Flutter
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -112,10 +99,16 @@ class EquipmentDetailsPDF {
     );
   }
 
-  // Helper method to add a row to the PDF grid
   static void _addRow(PdfGrid grid, String label, String value) {
     final PdfGridRow row = grid.rows.add();
     row.cells[0].value = label;
     row.cells[1].value = value;
+  }
+
+  static void _addChecklistRow(PdfGrid grid, String question, String answer, String remark) {
+    final PdfGridRow row = grid.rows.add();
+    row.cells[0].value = question;
+    row.cells[1].value = answer;
+    row.cells[2].value = remark;
   }
 }

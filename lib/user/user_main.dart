@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ppm/user/searchUserQuery.dart';
 import 'package:ppm/user/service_app.dart';
+import 'package:ppm/user/userNfcRead.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../nfcread.dart';
@@ -158,7 +159,7 @@ class _userMainState extends State<userMain> {
                     ),
                     onTap: (){
                       Navigator.push(context,
-                          MaterialPageRoute(builder:(context)=>nfcRead())
+                          MaterialPageRoute(builder:(context)=>userNfcRead())
                       );
                     },),
                   GestureDetector(

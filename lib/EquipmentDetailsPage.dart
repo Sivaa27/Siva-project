@@ -34,6 +34,8 @@ class _EquipmentDetailsPageState extends State<EquipmentDetailsPage> {
   late TextEditingController _typeController;
   late TextEditingController _dateController;
   late TextEditingController _nextDateController;
+  late TextEditingController _commentsController; // Added
+  late TextEditingController _performedByController; // Added
   late DateTime _selectedDate;
   @override
   void initState() {
@@ -53,6 +55,7 @@ class _EquipmentDetailsPageState extends State<EquipmentDetailsPage> {
     _dateController = TextEditingController(text: widget.equipment.date);
     _nextDateController =
         TextEditingController(text: widget.equipment.nextdate);
+
     _selectedDate = DateFormat('yyyy-MM-dd').parse(widget.equipment.nextdate);
 
   }
@@ -70,6 +73,8 @@ class _EquipmentDetailsPageState extends State<EquipmentDetailsPage> {
     _typeController.dispose();
     _dateController.dispose();
     _nextDateController.dispose();
+    _commentsController.dispose(); // Added
+    _performedByController.dispose(); // Added
     super.dispose();
   }
 
@@ -197,31 +202,38 @@ class _EquipmentDetailsPageState extends State<EquipmentDetailsPage> {
                             builder: (context) => QuestionnairePage()),
                       );
 
-                      // Generate PDF with selected values from the questionnaire
-                      await EquipmentDetailsPDF.generatePDF(
-                        fileName: 'equipment_details.pdf',
-                        nameController: _nameController,
-                        serialController: _serialController,
-                        manufacturerController: _manufacturerController,
-                        hospitalController: _hospitalController,
-                        departmentController: _departmentController,
-                        wardController: _wardController,
-                        picController: _picController,
-                        classController: _classController,
-                        typeController: _typeController,
-                        dateController: _dateController,
-                        nextDateController: _nextDateController,
-                        questionnaireValues:
-                            selectedValues, // Pass selected values to the PDF generation method
-                        context: context,
-                      );
+                      if (selectedValues != null) {
+                        final questionnaireValues =
+                        selectedValues['questionnaireValues'] as Map<String, String?>;
+                        final remarks = selectedValues['remarks'] as Map<String, String>;
 
-                      // Show a message to the user
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('PDF generated successfully.'),
-                        ),
-                      );
+                        // Generate PDF with selected values from the questionnaire
+                        await EquipmentDetailsPDF.generatePDF(
+                          fileName: 'equipment_details.pdf',
+                          nameController: _nameController,
+                          serialController: _serialController,
+                          manufacturerController: _manufacturerController,
+                          hospitalController: _hospitalController,
+                          departmentController: _departmentController,
+                          wardController: _wardController,
+                          picController: _picController,
+                          classController: _classController,
+                          typeController: _typeController,
+                          dateController: _dateController,
+                          nextDateController: _nextDateController,
+                          questionnaireValues: questionnaireValues,
+                          remarks: remarks, // Pass remarks here
+                          comments: selectedValues['comments'], // Use selectedValues directly
+                          performedBy: selectedValues['performedBy'],
+                          context: context,
+                        );
+                        // Show a message to the user
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('PDF generated successfully.'),
+                          ),
+                        );
+                      }
                     },
                     child: Text('Generate PDF'),
                   ),
