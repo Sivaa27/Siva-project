@@ -66,9 +66,9 @@ class EquipmentDetailsPDF {
     checklistGrid.columns.add(count: 3);
 
     final PdfGridRow checklistHeaderRow = checklistGrid.headers.add(1)[0];
-    checklistHeaderRow.cells[0].value = 'Question';
-    checklistHeaderRow.cells[1].value = 'Answer';
-    checklistHeaderRow.cells[2].value = 'Remark';
+    checklistHeaderRow.cells[0].value = 'Procedure';
+    checklistHeaderRow.cells[1].value = 'Pass/Fail';
+    checklistHeaderRow.cells[2].value = 'Remarks if any';
     checklistHeaderRow.style.font = PdfStandardFont(PdfFontFamily.helvetica, 10, style: PdfFontStyle.bold);
 
     for (final entry in questionnaireValues.entries) {
