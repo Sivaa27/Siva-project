@@ -8,6 +8,7 @@ import 'dart:convert';
 
 import '../EquipmentDetailsPage.dart';
 import '../model/equipmentmodel.dart';
+import 'EquipmentDetailsPageUser.dart';
 
 class userNfcRead extends StatefulWidget {
   const userNfcRead({super.key});
@@ -70,7 +71,7 @@ class _userNfcReadState extends State<userNfcRead> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EquipmentDetailsPage(equipment: equipment),
+        builder: (context) => EquipmentDetailsPageUser(equipment: equipment),
       ),
     );
   }
