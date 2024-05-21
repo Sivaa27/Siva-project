@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ppm/home.dart';
 import 'package:ppm/profile.dart';
 import 'package:ppm/vendor_main.dart';
-import 'package:ppm/user/user_main.dart'; // Import user_main page
 
 class NavPage extends StatefulWidget {
   const NavPage({Key? key}) : super(key: key);
@@ -50,8 +49,15 @@ class _NavPageState extends State<NavPage> {
 
   Widget buildPages() {
     if (hospital == 'Vendor') {
-      return vendorMain();
+      // Handle page switching for Vendor
+      switch (index) {
+        case 1:
+          return manageAccount(); // Assuming this is the profile page
+        default:
+          return vendorMain();
+      }
     } else {
+      // Handle page switching for regular users
       switch (index) {
         case 1:
           return manageAccount();
