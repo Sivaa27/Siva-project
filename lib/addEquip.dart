@@ -154,6 +154,36 @@ class _addEquipState extends State<addEquip> {
                   ),
                 ),
                 SizedBox(height: 20),
+                TextFormField(
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return 'Please Enter Department';
+                    }
+                    return null;
+                  },
+                  onChanged: (val) {
+                    eqdepart = val;
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Equipment Department',
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return 'Please Enter Ward';
+                    }
+                    return null;
+                  },
+                  onChanged: (val) {
+                    eqward = val;
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Equipment Ward',
+                  ),
+                ),
+                SizedBox(height: 20),
                 Text(
                   'PPM Date',
                   style: TextStyle(
